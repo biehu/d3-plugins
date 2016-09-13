@@ -74,6 +74,10 @@
 			var textRadius = radius - lineLength - textMargin;
 			var g = g.append('g').attr('class', 'table-text');
 			
+			var value = g.datum().value ? 
+				new Number(g.datum().value).toFixed(2) + '<sub>%</sub>' : 
+				'无数据';
+			
 			g.append('foreignObject')
 			    .attr('class', 'table-text-0')
 				
@@ -84,7 +88,7 @@
 				
 			    .html([
 			      '   <p class="table-text-top">' +  g.datum().headerText + '</p>',
-		          '   <p class="table-text-val">' +  new Number(g.datum().value).toFixed(2) + '<sub>%</sub></p>',
+		          '   <p class="table-text-val">' +  value + '</p>',
 				  '   <div class="table-num-wrap">',
 			      '   <p class="table-num">' +  g.datum().val1 + '<span>提报量</span></p>',
 			      '   <p class="table-num">' +  g.datum().val2 + '<span>成交量</span></p>',
@@ -103,7 +107,7 @@
 		        .attr('height', textRadius * 2.5)
 		        
 		        .html([
-		          '   <p class="table-text-val">' +  new Number(g.datum().value).toFixed(2) + '<sub>%</sub></p>',
+		          '   <p class="table-text-val">' +  value + '</p>',
 		          '   <p class="table-btn">',
 		          '       <i><span>' +  g.datum().btnText + '</span></i>',
 		          '   </p>'
@@ -256,27 +260,29 @@
 					drawBg(g, d.type);
 			   })
 			   .on('touchstart', function (d) {
-			   	   var g = d3.select(this);
-				   var gClass = g.attr('class');
-				   var topG = d3.select('.top-circle');
-				   var type = gClass === 'left-circle' ? 'left' : 'right';
-				   
-				   if (gClass === 'top-circle') {
-				   	  location.href = d.url;
-				   } else {
-				      drawCirclePos(g, 'top', false);
-					  drawLineColor(g, d.value, 'top', false);
-					  drawBg(g, 'top');
-					  drawTextChange(g, 'top', false);
-					  g.attr('class', 'top-circle', false);
-					  
-				      drawCirclePos(topG, type, false);
-					  drawLineColor(topG, topG.datum().value, type, false);
-					  drawBg(topG, type);
-					  drawTextChange(topG, type, false);
-					  topG.attr('class', gClass);
-				   }
-			   })
+                   if (!d.value) return;
+                   
+                   var g = d3.select(this);
+                   var gClass = g.attr('class');
+                   var topG = d3.select('.top-circle');
+                   var type = gClass === 'left-circle' ? 'left' : 'right';
+                   
+                   if (gClass === 'top-circle') {
+                       location.href = d.url;
+                   } else {
+                       drawCirclePos(g, 'top', false);
+                       drawLineColor(g, d.value, 'top', false);
+                       drawBg(g, 'top');
+                       drawTextChange(g, 'top', false);
+                       g.attr('class', 'top-circle', false);
+                       
+                       drawCirclePos(topG, type, false);
+                       drawLineColor(topG, topG.datum().value, type, false);
+                       drawBg(topG, type);
+                       drawTextChange(topG, type, false);
+                       topG.attr('class', gClass);
+                   }
+			   });
 		};
 		
 		return init;
@@ -296,7 +302,7 @@
 	    },
 	    {
 	        type: 'left',
-	        value: 70,
+	        value: 0,
 	        url: 'http://www.qq.com',
 	        headerText: '金融项目线索优化',
 	        val1: 232234,
