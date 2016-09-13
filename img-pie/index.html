@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Untitled Document</title>
+	</head>
+	<body>
+		<div id="img-pie" class="img-pie"></div>
+		
+		<script src="../d3.v3.min.js"></script>
+		<script>
+		/*
+		 * 带icon的扇形图
+		 * 
+		 * @params {Array}
+		 *  [
+			{
+				label: '代理商',
+				value: 7000,
+				color: '#ff757c',
+				imgIcon: './1w.png',
+				labelIcon: './1.png'
+				
+			},
+			...
+			]
+		 */
+		var imgPie = (function () {
+			var width = 750;
+			var height = 500;
+			var radius = 140;
+			var margin = 30;
+			
+			var imgWidth = 24;
+			var imgHeight = 26;
+			
+			var endPointX = width / 2 - margin;
+			
+			var fontSize = 24;
+			
+			var barMarginBottom = 24;
+			var barMarginLeft = 130;
+			var barWidth = 180;
+			
+			var arc = d3.svg.arc()
+				.innerRadius(radius * 0.45)
+				.outerRadius(radius);
+				
+			var innerArc = d3.svg.arc()
+				.innerRadius(radius * (0.45 + (1 - 0.45) / 2))			
+				.outerRadius(radius * (0.45 + (1 - 0.45) / 2));
+				
+			var outerArc = d3.svg.arc()
+				.innerRadius(radius * 1.1)			
+				.outerRadius(radius * 1.1);
+				
+			var breakArc = d3.svg.arc()
+				.innerRadius(radius * 1.3)			
+				.outerRadius(radius * 1.3);
+			
+			var svg = d3.select('#img-pie')
+				.append('svg')
+				.attr("preserveAspectRatio", "xMaxYMax meet")
+		    	.attr("viewBox", "0 0 " + width + " " + height);
+				
+			var changeData = function () {
+				var all = d3.sum(data, function (d) {
+					return d.value;
+				});
+				data.map(function (d) {
+					return d.scale = d.value / all;
+				});
+			};
+			
+			var pie = d3.layout.pie()
+				.sort(null)
+				.value(function (d) {
+					return d.scale;
+				});
+				
+			var drawPie = function (slice) {
+				var getImgIconPos = function (d) {
+					return innerArc.centroid(d).map(function (d) {
+						return d - imgWidth / 2;
+					});
+				};
+				slice.append('path')
+					.attr('d', arc)
+					.style('fill', function (d) {
+						return d.data.color;
+					})
+					.each(function() {
+                      this._current = {startAngle: 0, endAngle: 0}; 
+                    })
+					.transition()
+                    .duration('1000')
+                    .attrTween('d', function(d) {
+                      var interpolate = d3.interpolate(this._current, d);
+                      this._current = interpolate(0);
+            
+                      return function(t) {
+                        return arc(interpolate(t));
+                      };
+                    })
+					.each('end', function () {
+						drawLine(slice);
+					});
+					
+				slice.append('image')
+					.attr('width', imgWidth)
+					.attr('height', imgHeight)
+					.attr('transform', function (d) {
+						return 'translate(' + getImgIconPos(d) + ')';
+					})
+					.attr('xlink:href', function (d) {
+						return d.data.imgIcon;
+					});
+			};
+			
+			var midAngle = function (d) {
+				return d.startAngle + (d.endAngle - d.startAngle) / 2;
+			};
+			var getTextAlign = function (d) {
+				if (midAngle(d) < Math.PI) {
+					return 'end';
+				} else {
+					return 'start';
+				}
+			};
+			var getEndPoint = function (d) {
+				var midPoint = breakArc.centroid(d);
+				var x;
+				if (midAngle(d) < Math.PI) {
+					x = endPointX;
+				} else {
+					x = -endPointX;
+				}
+				return [x, midPoint[1]];
+			};
+			
+			var drawLine = function (slice) {
+				slice.append('circle')
+					.attr('r', 4)
+					.attr('transform', function (d) {
+						return 'translate(' + outerArc.centroid(d) + ')';
+					})
+					.style('fill', function (d) {
+						return d.data.color;
+					});
+					
+				slice.append('path')
+					.style('stroke', function (d) {
+						return d.data.color;
+					})
+					.style('fill', 'none')
+					.attr('d', function (d) {
+						return 'M' + [outerArc.centroid(d), breakArc.centroid(d), getEndPoint(d)];
+					})
+					
+			        .attr('stroke-dasharray', 2000)
+			        .attr('stroke-dashoffset', 3000)
+			        .transition()		
+			        .duration(1000)		
+			        .ease('linear')
+			        .attr('stroke-dashoffset', 0)
+					.each('end', function () {
+						drawText(slice);
+					});
+					
+			};
+			
+			var drawText = function (slice) {
+				var textMargin = 10;
+				var textStyle = function (selection) {
+					selection
+						.style('font-size', fontSize)
+						.style('text-anchor', function (d) {
+							return getTextAlign(d);
+						});
+				};
+				var textWrap = slice.append('g');
+				
+				textWrap.append('text')
+					.attr('transform', function (d) {
+						var point = getEndPoint(d);
+						return 'translate(' + [point[0], point[1] - textMargin] + ')';
+					})
+					.text('直营店')
+					.style('fill', '#848484')
+					.call(textStyle)
+					
+					.append('tspan')
+					.text(function (d) {
+						return Math.round(d.data.scale * 100) + '%';
+					})
+					.style('fill', function (d) {
+						return d.data.color;
+					});
+					
+				textWrap.append('text')
+					.attr('transform', function (d) {
+						var point = getEndPoint(d);
+						return 'translate(' + [point[0], point[1] + textMargin] + ')';
+					})
+					.text(function (d) {
+						return d.data.value + '单';
+					})
+					.call(textStyle)
+					.style('dominant-baseline', 'hanging')
+					.style('fill', '#3e3e3e');
+					
+				textWrap.selectAll('text')
+					.style('fill-opacity', 0)
+					.transition()
+					.duration(1000)
+					.style('fill-opacity', 1)
+			};
+			
+			var drawBar = function (bar) {
+				var imgMargin = 10;
+				
+				bar.attr('transform', function (d, i) {
+					return 'translate(' + [i * barWidth, 0] + ')';
+				});
+				
+				bar.append('image')
+					.attr('width', imgWidth)
+					.attr('height', imgHeight)
+					.attr('xlink:href', function (d) {
+						return d.labelIcon;
+					});
+				bar.append('text')
+					.style('dominant-baseline', 'text-before-edge')
+					.style('font-size', fontSize)
+					.style('fill', '#3e3e3e')
+					.text(function (d) {
+						return d.label;
+					})
+					.attr('transform', 'translate(' + [imgWidth + imgMargin, 0] + ')');
+					
+			};
+				
+			return function (data) {
+				changeData(data);
+				
+				var slice = svg.append('g')
+					.attr('class', 'slices')
+					.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
+				
+					.selectAll('.slice')
+					.data(pie(data))
+					.enter()
+					.append('g')
+					.attr('class', 'slice');
+					
+				drawPie(slice);
+				
+				var bar = svg.append('g')
+					.attr('transform', 'translate(' + [barMarginLeft, height - barMarginBottom - imgHeight] + ')')
+					
+					.selectAll('.bar')
+					.data(data)
+					.enter()
+					.append('g')
+					.attr('class', '.bar');
+					
+				drawBar(bar);
+			};
+			
+		})();
+		
+		var data = [
+			{
+				label: '代理商',
+				value: 7000,
+				color: '#ff757c',
+				imgIcon: './1w.png',
+				labelIcon: './1.png'
+				
+			}, 
+			{
+				label: '直营店',
+				value: 8000,
+				color: '#25d0e4',
+				imgIcon: './2w.png',
+				labelIcon: './2.png'
+			},
+			{
+				label: '合作4s店',
+				value: 3123,
+				color: '#6b65f4',
+				imgIcon: './3w.png',
+				labelIcon: './3.png'
+			}
+		];
+		
+		imgPie(data);
+		</script>
+	</body>
+</html>
