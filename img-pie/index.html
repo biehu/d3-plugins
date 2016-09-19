@@ -38,9 +38,14 @@
 			
 			var fontSize = 24;
 			
-			var barMarginBottom = 24;
+			var barMarginBottom = 32;
 			var barMarginLeft = 130;
 			var barWidth = 180;
+			
+			var textMargin = 10;
+			var imgMargin = 10;
+			
+			var imgIconHideRadian = 0.24;
 			
 			var arc = d3.svg.arc()
 				.innerRadius(radius * 0.45)
@@ -77,14 +82,18 @@
 				.value(function (d) {
 					return d.scale;
 				});
-				
+			
+			var getImgIconPos = function (d) {
+				return innerArc.centroid(d).map(function (d) {
+					return d - imgWidth / 2;
+				});
+			};
 			var drawPie = function (slice) {
-				var getImgIconPos = function (d) {
-					return innerArc.centroid(d).map(function (d) {
-						return d - imgWidth / 2;
-					});
-				};
-				slice.append('path')
+				var pie = slice.append('g')
+					.attr('class', 'slice-pie')
+					.on('click', handleClickPie);
+				
+				pie.append('path')
 					.attr('d', arc)
 					.style('fill', function (d) {
 						return d.data.color;
@@ -95,26 +104,29 @@
 					.transition()
                     .duration('1000')
                     .attrTween('d', function(d) {
-                      var interpolate = d3.interpolate(this._current, d);
-                      this._current = interpolate(0);
-            
-                      return function(t) {
-                        return arc(interpolate(t));
-                      };
+                        var interpolate = d3.interpolate(this._current, d);
+                        this._current = interpolate(0);
+                        
+                        return function(t){
+                            return arc(interpolate(t));
+                        };
                     })
-					.each('end', function () {
-						drawLine(slice);
+					.each('end', function (d, i) {
+						if (i === slice.size() - 1) drawLine(slice);
 					});
 					
-				slice.append('image')
-					.attr('width', imgWidth)
-					.attr('height', imgHeight)
-					.attr('transform', function (d) {
-						return 'translate(' + getImgIconPos(d) + ')';
-					})
-					.attr('xlink:href', function (d) {
-						return d.data.imgIcon;
-					});
+				pie.filter(function (d) {
+					return d.endAngle - d.startAngle > imgIconHideRadian;
+				})
+				.append('image')
+				.attr('width', imgWidth)
+				.attr('height', imgHeight)
+				.attr('transform', function (d) {
+					return 'translate(' + getImgIconPos(d) + ')';
+				})
+				.attr('xlink:href', function (d) {
+					return d.data.imgIcon;
+				});
 			};
 			
 			var midAngle = function (d) {
@@ -139,7 +151,29 @@
 			};
 			
 			var drawLine = function (slice) {
-				slice.append('circle')
+				var endPoint, endDirection;	
+				var sign = slice.append('g')
+					.attr('class', 'slice-sign')
+					.style('opacity', function (d, i) {
+						var currentTextWrap = d3.select(this);
+						var opacity; 
+						if (!endPoint ||
+							endDirection !== getTextAlign(d) ||
+							endPoint &&
+							Math.abs(getEndPoint(d)[1] - endPoint[1]) > 2 * textMargin + 2 * fontSize) {
+							opacity = 1;
+							currentTextWrap.attr('data-hide', 'end');
+						} else {
+							opacity = .2;
+							currentTextWrap.attr('data-hide', 'start');
+						}
+						
+						endDirection = getTextAlign(d);
+						endPoint = getEndPoint(d);
+						return opacity;
+					});
+					
+				sign.append('circle')
 					.attr('r', 4)
 					.attr('transform', function (d) {
 						return 'translate(' + outerArc.centroid(d) + ')';
@@ -148,29 +182,29 @@
 						return d.data.color;
 					});
 					
-				slice.append('path')
+				sign.append('path')
 					.style('stroke', function (d) {
 						return d.data.color;
 					})
 					.style('fill', 'none')
-					.attr('d', function (d) {
+					.attr('d', function (d, i) {
 						return 'M' + [outerArc.centroid(d), breakArc.centroid(d), getEndPoint(d)];
 					})
-					
 			        .attr('stroke-dasharray', 2000)
 			        .attr('stroke-dashoffset', 3000)
 			        .transition()		
 			        .duration(1000)		
 			        .ease('linear')
 			        .attr('stroke-dashoffset', 0)
-					.each('end', function () {
-						drawText(slice);
+					.each('end', function (d, i) {
+						if (i === slice.size() - 1) drawText(sign);
 					});
 					
 			};
 			
-			var drawText = function (slice) {
-				var textMargin = 10;
+			var drawText = function (sign) {
+				var textWrap = sign.append('g').attr('class', 'slice-text');
+				
 				var textStyle = function (selection) {
 					selection
 						.style('font-size', fontSize)
@@ -178,17 +212,17 @@
 							return getTextAlign(d);
 						});
 				};
-				var textWrap = slice.append('g');
 				
 				textWrap.append('text')
 					.attr('transform', function (d) {
 						var point = getEndPoint(d);
 						return 'translate(' + [point[0], point[1] - textMargin] + ')';
 					})
-					.text('直营店')
+					.text(function (d) {
+						return d.data.label;
+					})
 					.style('fill', '#848484')
 					.call(textStyle)
-					
 					.append('tspan')
 					.text(function (d) {
 						return Math.round(d.data.scale * 100) + '%';
@@ -208,20 +242,61 @@
 					.call(textStyle)
 					.style('dominant-baseline', 'hanging')
 					.style('fill', '#3e3e3e');
-					
-				textWrap.selectAll('text')
+				
+				textWrap
 					.style('fill-opacity', 0)
 					.transition()
 					.duration(1000)
-					.style('fill-opacity', 1)
+					.style('fill-opacity', 1);
+			};
+			
+			var getPathByI = function (className) {
+				var path = d3.selectAll('.' + className);
+				return function (i) {
+					return path.filter(function (d, j) {
+						return j === i;
+					});
+				}; 
+			}; 
+			
+			var handleClickPie = function (d, i) {
+				var getSignByI = getPathByI('slice-sign');
+				var getPieByI = getPathByI('slice-pie');
+				var text = getSignByI(i);
+				var pies = d3.selectAll('.slice-pie');
+				var pie = getPieByI(i);
+				var hideOpacity = 0.2;
+				var clickPieOpacity = 0.7;
+				var i1, i2;
+				
+				i1 = i2 = i;
+				
+				var prev = text;
+				while (prev.size() && prev.attr('data-hide') !== 'end') {
+					i1--;
+					prev.style('opacity', hideOpacity);
+					prev = getSignByI(i1);
+				}
+				prev.style('opacity', hideOpacity);
+				
+				var next = getSignByI(++i2);
+				while (next.size() && next.attr('data-hide') !== 'end') {
+					i2++;
+					next.style('opacity', hideOpacity);
+					next = getSignByI(i2);
+				}
+				
+				text.style('opacity', 1);
+				
+				pies.style('opacity', 1);
+				pie.style('opacity', clickPieOpacity);
 			};
 			
 			var drawBar = function (bar) {
-				var imgMargin = 10;
-				
 				bar.attr('transform', function (d, i) {
-					return 'translate(' + [i * barWidth, 0] + ')';
-				});
+					return 'translate(' + [i % 3 * barWidth,  Math.floor(i / 3) * (fontSize + 10)] + ')';
+				})
+				.on('click', handleClickPie);
 				
 				bar.append('image')
 					.attr('width', imgWidth)
@@ -237,7 +312,6 @@
 						return d.label;
 					})
 					.attr('transform', 'translate(' + [imgWidth + imgMargin, 0] + ')');
-					
 			};
 				
 			return function (data) {
@@ -256,13 +330,15 @@
 				drawPie(slice);
 				
 				var bar = svg.append('g')
-					.attr('transform', 'translate(' + [barMarginLeft, height - barMarginBottom - imgHeight] + ')')
+					.attr('transform', 'translate(' + 
+						[barMarginLeft, height - barMarginBottom - imgHeight] + 
+					')')
 					
 					.selectAll('.bar')
 					.data(data)
 					.enter()
 					.append('g')
-					.attr('class', '.bar');
+					.attr('class', 'bar');
 					
 				drawBar(bar);
 			};
@@ -272,7 +348,7 @@
 		var data = [
 			{
 				label: '代理商',
-				value: 7000,
+				value: 70000,
 				color: '#ff757c',
 				imgIcon: './1w.png',
 				labelIcon: './1.png'
@@ -280,14 +356,35 @@
 			}, 
 			{
 				label: '直营店',
+				value: 800,
+				color: '#25d034',
+				imgIcon: './2w.png',
+				labelIcon: './2.png'
+			},
+			{
+				label: '直营店',
+				value: 800,
+				color: '#25d0e7',
+				imgIcon: './2w.png',
+				labelIcon: './2.png'
+			},
+			{
+				label: '直营店',
+				value: 800,
+				color: '#25d069',
+				imgIcon: './2w.png',
+				labelIcon: './2.png'
+			},
+			{
+				label: '直营店',
 				value: 8000,
-				color: '#25d0e4',
+				color: '#25d031',
 				imgIcon: './2w.png',
 				labelIcon: './2.png'
 			},
 			{
 				label: '合作4s店',
-				value: 3123,
+				value: 30000,
 				color: '#6b65f4',
 				imgIcon: './3w.png',
 				labelIcon: './3.png'
