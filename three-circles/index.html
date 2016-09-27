@@ -258,7 +258,7 @@
 	        
 	        var gs = svg.append("g")
 	            .attr('transform', 'translate(0,' + (radius + marginTop) + ')')
-				.selectAll('.circle')
+				.selectAll('g')
 			    .data(data, function (d) {
                     return d.type;
                 });
@@ -266,7 +266,7 @@
 			gs.enter()
 			   .append('g')
 			   .attr('class', function (d) {
-			   	   return d.type + '-circle circle';
+			   	   return d.type + '-circle';
 			   })
 			   .attr('pos-type', function (d) {
                    return d.type;
@@ -296,13 +296,13 @@
                    d.sendUrl();
                } else {
                    drawCirclePos(g, 'top', false);
-                   drawLineColor(g, d.value, 'top', false);
+//                   drawLineColor(g, d.value, 'top', false);
                    drawBg(g, 'top');
                    drawTextChange(g, 'top', false);
                    g.attr('class', 'top-circle', false);
                    
                    drawCirclePos(topG, type, false);
-                   drawLineColor(topG, topG.datum().value, type, false);
+//                   drawLineColor(topG, topG.datum().value, type, false);
                    drawBg(topG, type);
                    drawTextChange(topG, type, false);
                    topG.attr('class', gClass);
