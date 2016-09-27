@@ -16,7 +16,7 @@
         {
             type: 'top', // 初始位置标示
             value: 100, // 中央百分比数值
-            url: 'http://www.yiche.com', // 圆圈链接
+            sendUrl: function, // 圆圈点击跳转
             headerText: '金融项目线索优化', // 圆圈头部标题
             val1: 232234, // 提报量
             val2: 232244, // 成交量
@@ -24,21 +24,31 @@
         }，
         ...
         ]
+        
+        @params {Object} 
+        {
+            clear: true, // 是否清理画布
+            width:750,// 画布宽度
+	        height:750,// 画布高度
+	        marginTop:44,// 顶部边距
+	        marginLeft:80,// 左右边距
+	        radius:220,// 大圆半径
+	        lineLength:40// 大圆间隔线长度
+        }
+        
 	 * 
 	 * 
 	 * 
 	 */
 		
 	var threeCircles = (function () {
-		
 		var width = 750;
 		var height = 750;
-		
 		var marginTop = 44;
 		var marginLeft = 80;
-		
 		var radius = 220;
 		var lineLength = 40;
+		
 		var textMargin = 20;
 		var smallScale = 0.5;
 		
@@ -51,13 +61,8 @@
 		
 		var svg = d3.select(".container")
 		    .append("svg")
-			.attr('class', 'circle-group')
-			.attr("preserveAspectRatio", "xMaxYMax meet")
-		    .attr("viewBox", "0 0 " + width + " " + height);
-		
-		var wrap = svg.append("g")
-		    .attr('transform', 'translate(0,' + (radius + marginTop) + ')');
-		
+			.attr('class', 'circle-group');
+			
 		var drawBg = function (g, type) {
 			var circleBg;
 				
@@ -214,11 +219,12 @@
 		
 		var drawTextChange = function (g, type, isInit) {
 			var gt;
-			if (isInit) {
-			   gt = g.select('.table-text');
-			} else {
-			   gt = g.select('.table-text').transition().duration(lineDuration)
-			}
+            
+            if (isInit) {
+                gt = g.select('.table-text');
+            } else {
+                gt = g.select('.table-text').transition().duration(lineDuration)
+            }
 			if (type === 'top') {
 				gt.select('.table-text-0')
 				  .attr('transform', 'scale(1)');
@@ -234,59 +240,78 @@
 			}
 		};
 		
-		var init = function (data) {
+		return function (data, options) {
 			if (!Array.isArray(data)) return;
 			
-			var gs = wrap.selectAll('g')
-			   .data(data)
-			   .enter()
+			options = options || {};
+            width = options.width || width;
+            height = options.height || height;
+            marginTop = options.marginTop || marginTop;
+            marginLeft = options.marginLeft || marginLeft;
+            radius = options.radius || radius;
+            lineLength = options.lineLength || lineLength;
+			
+			if (options.clear) svg.selectAll('g').remove();
+			
+	        svg.attr("preserveAspectRatio", "xMaxYMax meet")
+	            .attr("viewBox", "0 0 " + width + " " + height);
+	        
+	        var gs = svg.append("g")
+	            .attr('transform', 'translate(0,' + (radius + marginTop) + ')')
+				.selectAll('.circle')
+			    .data(data, function (d) {
+                    return d.type;
+                });
+			   
+			gs.enter()
 			   .append('g')
 			   .attr('class', function (d) {
-			   	   return d.type + '-circle';
+			   	   return d.type + '-circle circle';
 			   })
 			   .attr('pos-type', function (d) {
                    return d.type;
-               })
-			   .each(function (d) {
-		            var g = d3.select(this);
-					var color1, color2;
-					
-					drawCircle(g);
-					drawText(g);
-					
-					drawTextChange(g, d.type, true);
-					drawCirclePos(g, d.type, true);
-					drawLineColor(g, d.value, d.type, true);
-					drawBg(g, d.type);
-			   })
-			   .on('touchstart', function (d) {
-                   if (!d.value) return;
+               });
+		   
+			gs.each(function (d) {
+	            var g = d3.select(this);
+				var color1, color2;
+				
+				drawCircle(g);
+				drawText(g);
+				
+				drawTextChange(g, d.type, true);
+				drawCirclePos(g, d.type, true);
+				drawLineColor(g, d.value, d.type, true);
+				drawBg(g, d.type);
+		   })
+		   .on('touchstart', function (d) {
+               if (!d.value) return;
+               
+               var g = d3.select(this);
+               var gClass = g.attr('class');
+               var topG = d3.select('.top-circle');
+               var type = gClass === 'left-circle' ? 'left' : 'right';
+               
+               if (gClass === 'top-circle' && d.sendUrl && typeof d.sendUrl === 'function') {
+                   d.sendUrl();
+               } else {
+                   drawCirclePos(g, 'top', false);
+                   drawLineColor(g, d.value, 'top', false);
+                   drawBg(g, 'top');
+                   drawTextChange(g, 'top', false);
+                   g.attr('class', 'top-circle', false);
                    
-                   var g = d3.select(this);
-                   var gClass = g.attr('class');
-                   var topG = d3.select('.top-circle');
-                   var type = gClass === 'left-circle' ? 'left' : 'right';
-                   
-                   if (gClass === 'top-circle') {
-                       location.href = d.url;
-                   } else {
-                       drawCirclePos(g, 'top', false);
-                       drawLineColor(g, d.value, 'top', false);
-                       drawBg(g, 'top');
-                       drawTextChange(g, 'top', false);
-                       g.attr('class', 'top-circle', false);
-                       
-                       drawCirclePos(topG, type, false);
-                       drawLineColor(topG, topG.datum().value, type, false);
-                       drawBg(topG, type);
-                       drawTextChange(topG, type, false);
-                       topG.attr('class', gClass);
-                   }
-			   });
+                   drawCirclePos(topG, type, false);
+                   drawLineColor(topG, topG.datum().value, type, false);
+                   drawBg(topG, type);
+                   drawTextChange(topG, type, false);
+                   topG.attr('class', gClass);
+               }
+		   });
+			   
+		   gs.exit().remove();
 		};
 		
-		return init;
-	
 	})();
 	
 	
@@ -294,7 +319,7 @@
 	    {
 	        type: 'top',
 	        value: 100,
-	        url: 'http://www.yiche.com',
+	        sendUrl: function () {},
 	        headerText: '金融项目线索优化',
 	        val1: 232234,
 	        val2: 232244,
@@ -303,7 +328,7 @@
 	    {
 	        type: 'left',
 	        value: 0,
-	        url: 'http://www.qq.com',
+	        sendUrl: function () {},
 	        headerText: '金融项目线索优化',
 	        val1: 232234,
 	        val2: 232244,
@@ -312,13 +337,15 @@
 	    {
 	        type: 'right',
 	        value: 60,
-	        url: 'http://www.jd.com',
+	        sendUrl: function () {},
 	        headerText: '金融项目线索优化',
 	        val1: 232234,
 	        val2: 232244,
 	        btnText: '2月'
 	    }
-	]);
+	], {
+		clear: true
+	});
 	
 	
 	</script>
