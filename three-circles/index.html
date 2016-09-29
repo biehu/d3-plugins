@@ -79,9 +79,21 @@
 			var textRadius = radius - lineLength - textMargin;
 			var g = g.append('g').attr('class', 'table-text');
 			
-			var value = g.datum().value ? 
-				new Number(g.datum().value).toFixed(2) + '<sub>%</sub>' : 
-				'无数据';
+			var valuePointAfterNum, value;
+			if (g.datum().value) {
+				var valueNum = g.datum().value.toString().length;
+	            if (valueNum < 4) {
+	                valuePointAfterNum = 2;
+	            } else if (valueNum === 4)  {
+	                valuePointAfterNum = 1;
+	            } else {
+	                valuePointAfterNum = 0;
+	            }
+				
+				value = new Number(g.datum().value).toFixed(valuePointAfterNum) + '<sub>%</sub>';
+			} else {
+				value = '无数据';
+			}
 			
 			g.append('foreignObject')
 			    .attr('class', 'table-text-0')
@@ -318,7 +330,7 @@
 	threeCircles([
 	    {
 	        type: 'top',
-	        value: 100,
+	        value: 10000,
 	        sendUrl: function () {},
 	        headerText: '金融项目线索优化',
 	        val1: 232234,
