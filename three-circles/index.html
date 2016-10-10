@@ -151,7 +151,8 @@
 			var circle = g.append('circle')
 		        .attr('x', 0)
 		        .attr('y', 0)
-		        .attr('r', radius);
+		        .attr('r', radius)
+				.attr('fill', 'transparent');
 			var moreBg = g.append('defs').append('radialGradient')
 		        .attr('id', 'radialGradient')
 				.attr('r', '50%')
@@ -325,8 +326,7 @@
 		};
 		
 	})();
-	
-	
+
 	threeCircles([
 	    {
 	        type: 'top',
