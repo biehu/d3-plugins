@@ -55,6 +55,7 @@
 		var startColor = '#ff6000';
 		var endColor = '#f3ff30';
 		var onlyColor = '#34f8d1';
+		var defaultColor = '#fff';
 		var colorScale = d3.scale.linear().domain([0, 60]).range([startColor, endColor]);
 		
 		var lineDuration = 600;
@@ -138,7 +139,7 @@
 			var lines = g.append('g').selectAll('line').data(d3.range(0, 60)).enter()
 				.append('line')
 				.attr('class', 'circle-line')
-				.style('stroke', '#fff')
+				.style('stroke', defaultColor)
 				.style('stroke-width', 2)
 				.attr('x1', 0)
 				.attr('y1', radius)
@@ -179,7 +180,7 @@
 		};  
 		
 		var clearLineColor = function (g) {
-			g.selectAll('line').style('stroke', '#fff')
+			g.selectAll('line').style('stroke', defaultColor)
 		        .style('stroke-width', 2);
 		};
 		
@@ -263,6 +264,10 @@
             marginLeft = options.marginLeft || marginLeft;
             radius = options.radius || radius;
             lineLength = options.lineLength || lineLength;
+			defaultColor = options.defaultColor || defaultColor;
+			startColor = options.startColor || startColor;
+			endColor = options.endColor || endColor;
+			onlyColor = options.onlyColor || onlyColor;
 			
 			if (options.clear) svg.selectAll('g').remove();
 			
