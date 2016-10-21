@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Untitled Document</title>
+    </head>
+    <body>
+    	
+		<div id="conversionRateLineId" style="height: 300px;"></div>
+    	
+		<script src="../lib/jquery.min.js"></script>
+		<script src="../lib/echarts-all.js"></script>
+		<script src="../src/YXCharts.js"></script>
+		<script src="../src/ui/rateLine.js"></script>
+		
+		<script>
+			var yxcharts = new YXCharts(
+			     document.getElementById('conversionRateLineId'),
+				 'rateLine',
+				 {
+				 	xAxis: [
+					   {
+					   	   data: ["5月", "6月", "7月", "8月", "9月", "10月"]
+					   }
+				    ],
+					series: [
+					   {
+					   	   data: [0, "0.40", "0.32", "0.49", "0.60", "0.19"]
+					   }
+					]
+				 },
+				 {
+	                yAxis: [
+	                    {
+	                        axisLabel: {
+	                            textStyle: {
+	                                color: '#f00'
+	                            }
+	                        }
+	                    }
+	                ]
+	            }
+			);
+			
+		</script>
+    </body>
+</html>

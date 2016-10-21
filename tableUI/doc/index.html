@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Untitled Document</title>
+		<link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+		<div class="documentation-header">
+            <div class="documentation-title-wrapper">
+                <h1 class="hero-title">YXChart.js</h1>
+                <h2 class="hero-subtitle">说明文档</h2>
+            </div>
+        </div>
+		<hr style="display: block; width: 100%; max-width: 100%; " />
+		<div class="documentation-body">
+			<h2>怎么使用</h2>
+			
+			<h3>引入jQuery</h3>
+			<pre>
+&lt;div id=&quot;conversionRateLineId&quot; style=&quot;height: 300px;&quot;&gt;&lt;/div&gt;
+&lt;script src=&quot;../lib/jquery.min.js&quot;&gt;&lt;/script&gt;
+
+
+
+			</pre>
+			<h3>引入d3或者echarts</h3>
+			
+			<pre>
+&lt;script src=&quot;../lib/d3.v3.min.js&quot;&gt;&lt;/script&gt; 或者				
+&lt;script src=&quot;../lib/echarts-all.js&quot;&gt;&lt;/script&gt;
+			</pre>
+			
+			<h3>引入d3类库或者配置类</h3>
+			
+			<pre>
+&lt;script src=&quot;../src/YXCharts.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../src/config/rateLine.js&quot;&gt;&lt;/script&gt;				
+				
+			</pre>
+			
+			<h3>调用 new YXChart</h3>
+			
+			<pre>
+var yxcharts = new YXCharts(
+	 document.getElementById('conversionRateLineId'),
+	 'rateLine',
+	 {
+	    xAxis: [
+	       {
+	           data: ["5月", "6月", "7月", "8月", "9月", "10月"]
+	       }
+	    ],
+	    series: [
+	       {
+	           data: [0, "0.40", "0.32", "0.49", "0.60", "0.19"]
+	       }
+	    ]
+	 },
+	 {
+	    yAxis: [
+	        {
+	            axisLabel: {
+	                textStyle: {
+	                    color: '#f00'
+	                }
+	            }
+	        }
+	    ]
+	}
+);
+			</pre>
+		</div>
+    </body>
+</html>

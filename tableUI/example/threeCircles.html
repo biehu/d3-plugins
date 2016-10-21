@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<link rel="stylesheet" href="../src/ui/threeCircles.css" />
+</head>
+<body>
+    <div id="container"></div>
+    
+    <script src="../lib/d3.v3.min.js"></script>
+    <script src="../lib/jquery.min.js"></script>
+    <script src="../src/YXCharts.js"></script>
+	<script src="../src/ui/threeCircles.js"></script>
+    
+	<script>
+     var tc =  new YXCharts(
+        document.getElementById('container'), 
+	    'threeCircles',
+       {
+           data: [
+                {
+                    type: 'top',
+                    value: 10000,
+                    sendUrl: function () {},
+                    headerText: '金融项目线索优化',
+                    val1: 232234,
+                    val2: 232244,
+                    btnText: '4月'
+                },
+                {
+                    type: 'left',
+                    value: 0,
+                    sendUrl: function () {},
+                    headerText: '金融项目线索优化',
+                    val1: 232234,
+                    val2: 232244,
+                    btnText: '3月'
+                },
+                {
+                    type: 'right',
+                    value: 60,
+                    sendUrl: function () {},
+                    headerText: '金融项目线索优化',
+                    val1: 232234,
+                    val2: 232244,
+                    btnText: '2月'
+                }
+        ]
+    },
+	{
+		circleGradualColor: ['#000', '#f00']
+	});
+	
+	
+    </script>
+</body>
+</html>
