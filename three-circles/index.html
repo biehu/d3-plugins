@@ -56,6 +56,7 @@
 		var endColor = '#f3ff30';
 		var onlyColor = '#34f8d1';
 		var defaultColor = '#fff';
+		var defaultGradualColor = '#fff';
 		var colorScale = d3.scale.linear().domain([0, 60]).range([startColor, endColor]);
 		
 		var lineDuration = 600;
@@ -139,7 +140,7 @@
 			var lines = g.append('g').selectAll('line').data(d3.range(0, 60)).enter()
 				.append('line')
 				.attr('class', 'circle-line')
-				.style('stroke', defaultColor)
+				.style('stroke', isTop ? defaultGradualColor : defaultColor)
 				.style('stroke-width', 2)
 				.attr('x1', 0)
 				.attr('y1', radius)
@@ -179,8 +180,8 @@
 		       
 		};  
 		
-		var clearLineColor = function (g) {
-			g.selectAll('line').style('stroke', defaultColor)
+		var clearLineColor = function (g, color) {
+			g.selectAll('line').style('stroke', color)
 		        .style('stroke-width', 2);
 		};
 		
@@ -189,7 +190,7 @@
 			var lines = g.selectAll('line');
 		    var valScale = d3.scale.linear().domain([0, 100]).range([0, 60]);
 			
-			clearLineColor(g);
+			clearLineColor(g, isTop ? defaultGradualColor : defaultColor);
 		    
 			var hoverLines = lines.filter(function (d) {
 		       return d <  valScale(val); 
@@ -265,6 +266,7 @@
             radius = options.radius || radius;
             lineLength = options.lineLength || lineLength;
 			defaultColor = options.defaultColor || defaultColor;
+			defaultGradualColor = options.defaultGradualColor || defaultGradualColor;
 			startColor = options.startColor || startColor;
 			endColor = options.endColor || endColor;
 			onlyColor = options.onlyColor || onlyColor;
@@ -361,7 +363,8 @@
 	        btnText: '2月'
 	    }
 	], {
-		clear: true
+		clear: true,
+		defaultGradualColor: '#000'
 	});
 	
 	
