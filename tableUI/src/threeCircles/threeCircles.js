@@ -23,8 +23,7 @@
  * 
  * 
  */
-
-YXCharts.ui.threeCircles = (function () {
+YXCharts.threeCircles = function (dom) {
 	var width = 750;
 	var height = 750;
     var marginTop = 44;
@@ -37,12 +36,16 @@ YXCharts.ui.threeCircles = (function () {
 	
     var lineDuration = 600;
 	
-    var svg, colorScale;
-	
 	var defaults = {
 	    circleGradualColor: ['#ff6000', '#f3ff30'],
-	    circleColor: '#34f8d1'
+	    circleColor: '#34f8d1',
+	    data: []
 	};
+	
+	var svg = d3.select(dom).append("svg")
+        .attr('class', 'circle-group')
+        .attr("preserveAspectRatio", "xMaxYMax meet")
+        .attr("viewBox", "0 0 " + width + " " + height);
         
     var drawBg = function (g, type) {
         var circleBg;
@@ -177,6 +180,7 @@ YXCharts.ui.threeCircles = (function () {
         
         var n = hoverLines.size();
         var setStroke = function (selection) {
+			var colorScale = d3.scale.linear().domain([0, 60]).range(defaults.circleGradualColor);
             selection
               .style('stroke', function (d) {
                 return isTop ? colorScale(d) : defaults.circleColor;
@@ -233,17 +237,47 @@ YXCharts.ui.threeCircles = (function () {
               .attr('transform', 'scale(1)');
         }
     };
+	
+	var render = function (selection) {
+		selection.each(function (d) {
+            var g = d3.select(this);
+            var color1, color2;
+            
+            drawCircle(g);
+            drawText(g);
+            
+            drawTextChange(g, d.type, true);
+            drawCirclePos(g, d.type, true);
+            drawLineColor(g, d.value, d.type, true);
+            drawBg(g, d.type);
+       })
+       .on('touchstart', function (d) {
+           if (!d.value) return;
+           
+           var g = d3.select(this);
+           var gClass = g.attr('class');
+           var topG = d3.select('.top-circle');
+           var type = gClass === 'left-circle' ? 'left' : 'right';
+           
+           if (gClass === 'top-circle' && d.sendUrl && typeof d.sendUrl === 'function') {
+               d.sendUrl();
+           } else {
+               drawCirclePos(g, 'top', false);
+//                   drawLineColor(g, d.value, 'top', false);
+               drawBg(g, 'top');
+               drawTextChange(g, 'top', false);
+               g.attr('class', 'top-circle', false);
+               
+               drawCirclePos(topG, type, false);
+//                   drawLineColor(topG, topG.datum().value, type, false);
+               drawBg(topG, type);
+               drawTextChange(topG, type, false);
+               topG.attr('class', gClass);
+           }
+       });
+	};
     
     return {
-        init: function (dom) {
-            // 设置dom
-            if (!svg) {
-                svg = d3.select(dom).append("svg").attr('class', 'circle-group');
-                svg.attr("preserveAspectRatio", "xMaxYMax meet")
-                    .attr("viewBox", "0 0 " + width + " " + height);
-            }
-            return this;
-        },
         clear: function () {
             svg.selectAll('g').remove();
 			return this;
@@ -253,64 +287,27 @@ YXCharts.ui.threeCircles = (function () {
         },
         setOption: function (options) {
             defaults = YXCharts.util.extend(true, {}, defaults, options);
-			colorScale = d3.scale.linear().domain([0, 60]).range(defaults.circleGradualColor);
 			
             var gs = svg.append("g")
                 .attr('transform', 'translate(0,' + (radius + marginTop) + ')')
                 .selectAll('g')
-                .data(defaults.data, function (d) {
-                    return d.type;
-                });
+                .data(defaults.data, function (d) { 
+				    return d.type; 
+				});
                
             gs.enter()
                .append('g')
-               .attr('class', function (d) {
-                   return d.type + '-circle';
-               })
-               .attr('pos-type', function (d) {
-                   return d.type;
-               });
+               .attr('class', function (d) { 
+			         return d.type + '-circle'; 
+				})
+               .attr('pos-type', function (d) { 
+			         return d.type; 
+			    });
            
-            gs.each(function (d) {
-                var g = d3.select(this);
-                var color1, color2;
-                
-                drawCircle(g);
-                drawText(g);
-                
-                drawTextChange(g, d.type, true);
-                drawCirclePos(g, d.type, true);
-                drawLineColor(g, d.value, d.type, true);
-                drawBg(g, d.type);
-           })
-           .on('touchstart', function (d) {
-               if (!d.value) return;
-               
-               var g = d3.select(this);
-               var gClass = g.attr('class');
-               var topG = d3.select('.top-circle');
-               var type = gClass === 'left-circle' ? 'left' : 'right';
-               
-               if (gClass === 'top-circle' && d.sendUrl && typeof d.sendUrl === 'function') {
-                   d.sendUrl();
-               } else {
-                   drawCirclePos(g, 'top', false);
-//                   drawLineColor(g, d.value, 'top', false);
-                   drawBg(g, 'top');
-                   drawTextChange(g, 'top', false);
-                   g.attr('class', 'top-circle', false);
-                   
-                   drawCirclePos(topG, type, false);
-//                   drawLineColor(topG, topG.datum().value, type, false);
-                   drawBg(topG, type);
-                   drawTextChange(topG, type, false);
-                   topG.attr('class', gClass);
-               }
-           });
+           render(gs); 
                
            gs.exit().remove();
 		   return this;
         }
-    }
-})();
-
+    };
+};

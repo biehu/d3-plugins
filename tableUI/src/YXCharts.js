@@ -11,42 +11,41 @@
  * @params params {Object} 默认defaults差异化配置
  * 
  */
-var YXCharts = function (dom, type, data, params) {
+var YXCharts = function (dom, defaults) {
 	this.dom = typeof dom === 'string' ? document.getElementById(dom) : dom;
-	this.type= type;
-	this.data = data;
-	this.params = params;
-	this.ui = YXCharts.ui[this.type].init(this.dom);
-	this.data.ajax ? this.sendAjax() : this.init();
+	this.defaults = defaults;
+	this.ui = YXCharts[this.defaults.type];
+	this.uiObj = null;
+	this.init();
 };
 
 YXCharts.prototype.sendAjax = function () {
 	var _this = this;
-	YXChart.util.ajax(YXCharts.util.extend(this.data, {
+	YXChart.util.ajax(YXCharts.util.extend(this.defaults.ajax, {
 		success: function (data) {
-			_this.data = data;
-			_this.init();
+			_this.defaults.data = data;
+			_this.wrap();
 		}
 	}));
 };
 
-YXCharts.prototype.init = function () {
-	var type = YXCharts.config[this.type] || {};
-	var datas = this.data;
-	if (type.apiHandles) datas = type.apiHandles.init(this.data);
-    this.setOption(YXCharts.util.extend(true, {}, type.defaults, datas, this.params));
-	if (type.helps) type.helps.init(this.dom, this.ui);
+YXCharts.prototype.wrap = function () {
+    var defaults = YXCharts.util.extend(true, {}, this.ui.defaults, this.defaults.defaults);
+    if (this.ui.defaultHandles) defaults = this.ui.defaultHandles.init(defaults);
+    this.setOption(defaults);
+    if (this.ui.helps) this.ui.helps.init(this.dom, this.uiObj);
 };
 
-// api语法糖
+YXCharts.prototype.init = function () {
+	this.uiObj = this.ui(this.dom);
+	this.defaults.ajax ? this.sendAjax() : this.wrap();
+};
+
 ['getOption', 'setOption', 'clear'].forEach(function (method) {
 	YXCharts.prototype[method] = function () {
-		return this.ui[method].apply(this.ui, arguments);
+		return this.uiObj[method].apply(this.uiObj, arguments);
 	};
 });
-
-// 自定义组件库
-YXCharts.ui = {};
 
 // 工具
 YXCharts.util = {
@@ -57,17 +56,19 @@ YXCharts.util = {
 // YXCharts.config 为配置项
 // 以下针对所有图表公共配置
 // 每个图表配置建立一个新的config的属性然后根据需要配置以下三项
-// 例如 YXCharts.config.XXX = {}; YXCharts.config.XXX = {defaults: {}, apiHandles: {}, helps: {}};
+// 例如 YXCharts.config.XXX = {}; YXCharts.config.XXX = {defaults: {}, dataHandles: {}, helps: {}};
 
 // defaults 前端默认配置 参考 echarts
-// apiHandles 处理data，格式{init: function (data) {}, ...}
+// defaultHandles 处理defaults，格式{init: function (defaults) {}, ...}
 // helps 处理界面，格式{init: function (dom, echarts) {}, ...}
-YXCharts.config = {defaults: {}, apiHandles: {}, helps: {}};
+YXCharts.defaults = {};
+YXCharts.defaultHandles = {};
+YXCharts.helps = {};
 
-YXCharts.config.apiHandles.lineToBorder = {
+YXCharts.defaultHandles.lineToBorder = {
     init: function (data) {
-        data.xAxis[0]['data'] = YXCharts.config.apiHandles.lineToBorder.changeX(data.xAxis[0]['data']);
-        data.series[0]['data'] = YXCharts.config.apiHandles.lineToBorder.changeY(data.series[0]['data']);
+        data.xAxis[0]['data'] = YXCharts.defaultHandles.lineToBorder.changeX(data.xAxis[0]['data']);
+        data.series[0]['data'] = YXCharts.defaultHandles.lineToBorder.changeY(data.series[0]['data']);
 		return data;
     },
 	
@@ -102,9 +103,8 @@ YXCharts.config.apiHandles.lineToBorder = {
     }
 };
 
-YXCharts.config.helps.diyX = {
+YXCharts.helps.diyX = {
 	init: function (dom, echarts) {
-		console.log(111, echarts.getOption());
 		var conversionRateLineOption = echarts.getOption();
 		var arrX = conversionRateLineOption.xAxis[0]['data']; 
 		var wrap = $(dom);

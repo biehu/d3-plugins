@@ -1,0 +1,35 @@
+ .scale-pie .h1  h1, .scale-pie .h3 h3, .scale-pie .h2 h2{
+    width: 80px;
+    margin: 0 auto;
+    padding-top: 20px;
+    line-height: 14px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: normal;
+}
+.scale-pie .h3 h3 {
+    padding-top: 65px;
+    word-wrap: break-word;
+}
+.scale-pie .h1  h1 span:after {
+    content: '%';
+    font-size: 12px;
+    vertical-align: top;
+}
+.scale-pie .h1  h1 span {
+    display: block;
+}
+.scale-pie .h1  h1{
+    overflow: hidden;
+    height: 34px;
+    padding-top: 0;
+    line-height: normal;
+    font-size: 40px;
+    color: #00d9bf;
+}
+.scale-pie .front {
+    fill: #00d9bf;
+}
+.scale-pie .bg {
+    fill: #eee;
+}
