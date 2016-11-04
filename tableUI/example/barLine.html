@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Untitled Document</title>
+    </head>
+    <body>
+    	
+		<div id="main" style=" height: 350px"></div>
+    	
+		<script src="../src/js/lib/jquery.min.js"></script>
+		<script src="../src/js/lib/echarts-all-3.js"></script>
+		<script src="../src/js/ycharts.js"></script>
+		<script src="../src/js/barLine.js"></script>
+		
+		<script>
+			ycharts
+				.init(document.getElementById('main'), 'barLine')
+				.setOption({
+					color: ['#78a1ff', '#a883fd', '#00d9bf'],
+					xAxis_axisLine_lineStyle_color: '#ffbcbe',
+					yAxis_1_axisLabel_formatter_suffix: '',
+					yAxis_2_axisLabel_formatter_suffix: '%',
+					title_text: '全国月度指标完成情况',
+					data: {
+						legend_data: ['蒸发量', '降水量', '平均温度'],
+						xAxis_data: ['2016-01','2016-02','2016-03','2016-04','2016-05','2016-06','2016-07','2016-08','2016-09','2016-10','2016-11','2016-12'],  //横坐标数组
+	                    series: [
+	                       {
+					            name:'蒸发量',
+					            data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+					        },
+					        {
+					            name:'降水量',
+					            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+					        },
+					        {
+					            name:'平均温度',
+					            data:[2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+					        }
+	                    ]
+					}
+				});
+			
+		</script>
+		
+    </body>
+</html>

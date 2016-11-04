@@ -1,43 +1,60 @@
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
-	<link rel="stylesheet" href="../src/scalePie/scalePie.css" />
+	<link rel="stylesheet" href="../src/css/common.css" />
+	<link rel="stylesheet" href="../src/css/scalePie.css" />
 </head>
 <body>
 <div id="chart" class="chart-container" style="width: 400px;height: 400px;"></div>
-<div id="chart2" class="chart-container" style="width: 200px;height: 400px;"></div>
+<div id="chart2" class="chart-container" style="width: 210px;height: 250px;"></div>
+<div id="chart3" class="chart-container" style="width: 210px;height: 250px;"></div>
 
-<script src="../lib/d3.v3.min.js"></script>
-<script src="../lib/jquery.min.js"></script>
-<script src="../src/YXCharts.js"></script>
-<script src="../src/scalePie/scalePie.js"></script>
+<script src="../src/js/lib/d3.v3.min.js"></script>
+<script src="../src/js/lib/jquery.min.js"></script>
+<script src="../src/js/ycharts.js"></script>
+<script src="../src/js/scalePie.js"></script>
 <script>
-    var scalePie = YXCharts.init(
-	   document.getElementById('chart'),
-	   {
-	   	   type: 'scalePie',
-		   defaults: {
-		   	    data: {
-		            h1: 99,
-		            h2: '全国租赁业务总体完成率',
-		            h3: '2016-09-25'
-		        } 
-		   }
-	   }
-	);
+    var ycharts1 = ycharts
+	   .init(document.getElementById('chart'), 'scalePie')
+	   .setOption({
+	   	    data: {
+	            middleVal: 99,
+	            middleValDesc: '全国租赁业务总体完成率',
+	            bottomText: '2016-09-25'
+	        },
+			title: {
+				show: false
+			}
+	    });
 	
-	 var scalePie2 = YXCharts.init(
-       document.getElementById('chart2'),
-       {
-           type: 'scalePie',
-           defaults: {
-                data: {
-                    h1: 92,
-                    h2: '全国租赁业务总体完成率',
-                    h3: '2016-09-25'
-                } 
-           }
-       }
-    );
+    var ycharts2 = ycharts
+	   .init(document.getElementById('chart2'), 'scalePie')
+       .setOption({
+	        data: {
+	            middleVal: 93,
+	            middleValDesc: '全国租赁业务总体完成率',
+	            bottomText: '2016-09-25'
+	        },
+			circleFrontColor: '#f00',
+			circleBgColor: '#999',
+			title: {
+				show: true,
+				data: ['全国9月月度指标累计完成率', '(截止到9月7日)']
+			}
+	    });
+		
+	 var ycharts3 = ycharts
+	   .init(document.getElementById('chart3'), 'scalePie')
+       .setOption({
+	        data: {
+	            middleVal: 87,
+	            middleValDesc: '年度完成率',
+	            bottomText: '2016年'
+	        },
+			title: {
+				show: true,
+				data: ['全国9月月度指标累计完成率', '(截止到9月7日)']
+			}
+	    });
 </script>
 </body>

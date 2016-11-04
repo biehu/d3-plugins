@@ -5,53 +5,88 @@
 </head>
 <body>
     <div id="container" style="width: 200px; height: 200px;"></div>
+	
+	<div id="container2" style="width: 250px; height: 200px;"></div>
     
     <script src="../lib/d3.v3.min.js"></script>
     <script src="../lib/jquery.min.js"></script>
-    <script src="../src/YXCharts.js"></script>
+    <script src="../src/ycharts.js"></script>
 	<script src="../src/threeCircles/threeCircles.js"></script>
     
 	<script>
-     var tc =  new YXCharts(
-        document.getElementById('container'), 
-		{
-		    type: 'threeCircles',
-	        defaults: {
-			   circleGradualColor: ['#000', '#f00'],
-	           data: [
-	                {
-	                    type: 'top',
-	                    value: 10000,
-	                    sendUrl: function () {},
-	                    headerText: '金融项目线索优化',
-	                    val1: 232234,
-	                    val2: 232244,
-	                    btnText: '4月'
-	                },
-	                {
-	                    type: 'left',
-	                    value: 0,
-	                    sendUrl: function () {},
-	                    headerText: '金融项目线索优化',
-	                    val1: 232234,
-	                    val2: 232244,
-	                    btnText: '3月'
-	                },
-	                {
-	                    type: 'right',
-	                    value: 60,
-	                    sendUrl: function () {},
-	                    headerText: '金融项目线索优化',
-	                    val1: 232234,
-	                    val2: 232244,
-	                    btnText: '2月'
-	                }
-	            ]
-			}
-		}
-    );
+     var tc = ycharts.init(document.getElementById('container'), 'threeCircles');
+	 tc.setOption({
+		   circleGradualColor: ['#000', '#f00'],
+	       data: [
+	            {
+	                type: 'top',
+	                value: 10000,
+	                sendUrl: function () {},
+	                headerText: '金融项目线索优化',
+	                val1: 232234,
+	                val2: 232244,
+	                btnText: '4月'
+	            },
+	            {
+	                type: 'left',
+	                value: 0,
+	                sendUrl: function () {},
+	                headerText: '金融项目线索优化',
+	                val1: 232234,
+	                val2: 232244,
+	                btnText: '3月'
+	            },
+	            {
+	                type: 'right',
+	                value: 60,
+	                sendUrl: function () {},
+	                headerText: '金融项目线索优化',
+	                val1: 232234,
+	                val2: 232244,
+	                btnText: '2月'
+	            }
+	        ]
+	});
 	
 	
+    </script>
+	
+	<script>
+     var tc2 = ycharts.init(document.getElementById('container2'), 'threeCircles');
+     tc2.setOption({
+           circleGradualColor: ['blue', '#f00'],
+           data: [
+                {
+                    type: 'top',
+                    value: 10,
+                    sendUrl: function () {},
+                    headerText: '金融项目线索优化',
+                    val1: 232234,
+                    val2: 232244,
+                    btnText: '4月'
+                },
+                {
+                    type: 'left',
+                    value: 0,
+                    sendUrl: function () {},
+                    headerText: '金融项目线索优化',
+                    val1: 232234,
+                    val2: 232244,
+                    btnText: '3月'
+                },
+                {
+                    type: 'right',
+                    value: 60,
+                    sendUrl: function () {},
+                    headerText: '金融项目线索优化',
+                    val1: 232234,
+                    val2: 232244,
+                    btnText: '2月'
+                }
+            ]
+    });
+    
+    
     </script>
 </body>
 </html>

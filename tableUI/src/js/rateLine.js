@@ -1,25 +1,20 @@
-YXCharts.rateLine = {};
-
-YXCharts.rateLine.init = function (dom, options) {
-	var echartsObj = echarts.init(dom);
-	echartsObj.clear();
-	echartsObj.setOption(options);
-	return echartsObj.getOption();
-};
-
-YXCharts.rateLine.helps = YXCharts.helps.diyX;
-
-YXCharts.rateLine.defaults = {
-    tooltip_textStyle: '#dd0'
-};
-
-YXCharts.rateLine.defaultHandles = {
-	init: function (dom, defaults) {
-		return YXCharts.util.extend(true, {},
-			YXCharts.defaultHandles.lineToBorder.init(dom, defaults), this.defaultFormat(dom, defaults));
-	}, 
-	defaultFormat: function (dom, defaults) {
-		return {
+ycharts._ui.rateLine = {
+	mixins: ['setOption'],
+	init: function () {
+		this.defaults = {
+			tip_textStyle: '#dd0'
+		};
+		this.echarts = echarts.init(this.dom);
+		this.options = {};
+		return this;
+	},
+	_setOption: function () {
+		this.options = ycharts.util.extend(true, {}, this.getFormatDefaults(), this.getLineToBorderDefaults());
+		this.echarts.setOption(this.options);
+		this.diyX();
+	},
+	getFormatDefaults: function () {
+        return {
             tooltip : {
                 show:true,
                 showContent:false,
@@ -29,7 +24,7 @@ YXCharts.rateLine.defaultHandles = {
                 textStyle: {
                     color: '#111f30',
                     },
-                    formatter: YXCharts.helps.diyX.onClick(dom),
+                    formatter: this.diyXonClick,
                 axisPointer:{
                     type:'none'
                 }
@@ -175,8 +170,8 @@ YXCharts.rateLine.defaultHandles = {
            
         };
     }
+	
 };
-
 
 
 

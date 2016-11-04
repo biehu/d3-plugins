@@ -9,75 +9,65 @@
 		<div id="conversionRateLineId" style="width: 300px; height: 300px;"></div>
 		<div id="conversionRateLineId2" style="height: 300px;"></div>
     	
-		<script src="../lib/jquery.min.js"></script>
-		<script src="../lib/echarts-all.js"></script>
-		<script src="../src/YXCharts.js"></script>
-		<script src="../src/rateLine/rateLine.js"></script>
+		<script src="../src/js/lib/jquery.min.js"></script>
+		<script src="../src/js/lib/echarts-all.js"></script>
+		<script src="../src/js/ycharts.js"></script>
+		<script src="../src/js/rateLine.js"></script>
 		
 		<script>
-			var yxcharts = YXCharts.init(
-			     document.getElementById('conversionRateLineId'),
-				 {
-				 	type : 'rateLine',
-					defaults: {
-						data: {
-							xAxis: [
-	                           {
-	                               data: ["5月", "6月", "7月", "8月", "9月", "10月"]
-	                           }
-	                        ],
-	                        series: [
-	                           {
-	                               data: [0, "0.40", "0.32", "0.49", "0.60", "0.19"]
-	                           }
-	                        ],
-	                        yAxis: [
-	                            {
-	                                axisLabel: {
-	                                    textStyle: {
-	                                        color: '#f00'
-	                                    }
+			ycharts
+				.init(document.getElementById('conversionRateLineId'), 'rateLine')
+				.setOption({
+					data: {
+						xAxis: [
+	                       {
+	                           data: ["5月", "6月", "7月", "8月", "9月", "10月"]
+	                       }
+	                    ],
+	                    series: [
+	                       {
+	                           data: [0, "0.40", "0.32", "0.49", "0.60", "0.19"]
+	                       }
+	                    ],
+	                    yAxis: [
+	                        {
+	                            axisLabel: {
+	                                textStyle: {
+	                                    color: '#f00'
 	                                }
 	                            }
-	                        ]
-						}
+	                        }
+	                    ]
 					}
-				 }
-			);
+				});
 			
+			ycharts
+				.init(document.getElementById('conversionRateLineId2'), 'rateLine')
+	            .setOption({
+	                data: {
+	                    xAxis: [
+	                       {
+	                           data: ["5月", "6月", "7月", "8月", "9月", "10月"]
+	                       }
+	                    ],
+	                    series: [
+	                       {
+	                           data: [0, "0.40", "0.32", "0.49", "0.60", "0.19"]
+	                       }
+	                    ],
+	                    yAxis: [
+	                        {
+	                            axisLabel: {
+	                                textStyle: {
+	                                    color: '#f00'
+	                                }
+	                            }
+	                        }
+	                    ]
+	                }
+	            });
+				
 		</script>
 		
-		<script>
-            var yxcharts2 = YXCharts.init(
-                 document.getElementById('conversionRateLineId2'),
-                 {
-                    type : 'rateLine',
-                    defaults: {
-                        data: {
-                            xAxis: [
-                               {
-                                   data: ["5月", "6月", "7月", "8月", "9月", "10月"]
-                               }
-                            ],
-                            series: [
-                               {
-                                   data: [0, "0.40", "0.32", "0.49", "0.60", "0.19"]
-                               }
-                            ],
-                            yAxis: [
-                                {
-                                    axisLabel: {
-                                        textStyle: {
-                                            color: '#f00'
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                 }
-            );
-            
-        </script>
     </body>
 </html>
