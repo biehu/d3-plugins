@@ -7,152 +7,135 @@ ycharts.util = {
     ajax: $.ajax
 };
 
-ycharts._create = function (dom, type) {
-	this.dom = dom;
-    this.type = type;
-	this.init();
-};
-
-ycharts._mix = function (mixins) {
-	if (!mixins) return;
-	var self = {}; 
-	for (var i = 0; i < mixins.length; i++) {
-		if (ycharts.common[mixins[i]]) self[mixins[i]] = ycharts.common[mixins[i]];
+ycharts._mix = function (uiPrototype, _ui) {
+	var _uis = [];
+	for (var i = 0; i < _ui.mixins.length; i++) {
+		_uis.push(ycharts._ui[_ui.mixins[i]]);
 	}
-	return self;
+	_uis.push(_ui);
+	ycharts.util.extend.apply(null, [true, uiPrototype, ycharts.common].concat(_uis));
 };
 
 ycharts.init = function (dom, type) {
 	if (!ycharts.ui[type]) {
-		ycharts.ui[type] = function () {
-			ycharts._create.apply(this, arguments);
+		if (!ycharts._ui[type]) throw new Error('ycharts._ui.' + type + ' is not defined');
+		ycharts.ui[type] = function (dom, type) {
+			this.dom = dom;
+			this.type = type;
 		};
-	    ycharts.util.extend(
-		    ycharts.ui[type].prototype, 
-		    ycharts._mix(ycharts._ui[type].mixins),
-		    ycharts._ui[type]
-	    );
+		ycharts._mix(ycharts.ui[type].prototype, ycharts._ui[type]);
     }
-	return new ycharts.ui[type](dom, type);
+	return new ycharts.ui[type](dom, type).init();
 };
 
 ycharts.common = {
-	setOption: function (defaults) {
+	setOption: function (defaults, type) {
         var _this = this;
-		this.defaults = ycharts.util.extend(true, {}, this.defaults, defaults);
+		var args = arguments;
+		
         if (defaults.ajaxParams) {
 			defaults.ajaxParams.success = function (d) {
 				_this.defaults.data = d;
-                _this._setOption();
+                _this._setOption.apply(_this, args);
 			};
-            this.ajax(defaults.ajaxParams);
+            ycharts.util.ajax(defaults.ajaxParams);
         } else {
-            this._setOption();
+            this._setOption.apply(_this, args);
         }
 		return this;
     },
-    getLineToBorderDefaults: function () {
-		var changeX = function (data) {
-	        var arrX = [];
-	        for (var i = 0; i < data.length; i++) {
-	            if (data[i].length == 10) {
-	                arrX[i] = data[i].substr(5, 10);
-	            } else {
-	                arrX[i] = data[i];
-	            }
-	        }
-	        arrX.unshift('a');
-	        arrX.push('a');
-	        return arrX;
-	    };
-	    var changeY = function (data) {
-	        var arr = [];
-	        for (var i = 0; i < data.length; i++) {
-	            if (data[i] != 0) {
-	                
-	                arr[i] = data[i].substr(0,data[i].length-1);
-	            } else {
-	                arr[i] = data[i];
-	            }
-	        }
-	        arr.unshift(arr[0]);
-	        arr.push(arr[arr.length-1]);
-	        return arr;
-	    };
-		var data = ycharts.util.extend(true, {}, this.defaults.data);
-        data.xAxis[0]['data'] = changeX(data.xAxis[0]['data']);
-        data.series[0]['data'] = changeY(data.series[0]['data']);
-		return data;
+	getOption: function () {
+		return this.defaults;
+	}
+};
+
+ycharts._ui.d3 = {
+	mixins: [],
+	_defaults: {},
+	init: function () {
+		this.defaults = {};
+        this.svg = d3.select(this.dom).append("svg");
+		this.wrap = null;
+		return this;
     },
-	diyX: function () {
-		var defaults = this.options;
+	_setOption: function (defaults) {
+		this.defaults = ycharts.util.extend({}, this._defaults, this.defaults, defaults);
+//		this.svg.attr({
+//			width: this.defaults.width  + 2 *this.defaults.margin,
+//			height: this.defaults.height +  2 *this.defaults.margin
+//		});
 		
-        var arrX = defaults.xAxis[0]['data']; 
-        var wrap = $(this.dom);
-        
-        var config = {
-            color: 'color:#2ad9fd;',
-            hover: 'color: #266bcb;background: #00eaff;'
-        };
-        
-        //线图横坐标
-	   if (wrap.find('#m_div').length > 0) wrap.find('#m_div').remove();
+		this.svg.attr("preserveAspectRatio", "xMaxYMax meet")
+            .attr("viewBox", "0 0 " + 
+				(this.defaults.width  + 2 *this.defaults.margin) + " " + 
+				(this.defaults.height +  2 *this.defaults.margin));
 		
-        var d=$('<div id="m_div" style="font-size: 9px;text-align: center;margin-left: -10px;margin-top: -18px;"></div>');
-        wrap.append(d);
-        var dStyle = '<style>' +
-          '#m_div{' + config.color + '}' +
-          '.act_x{' + config.hover + '}' +
-          '</style>';
-        wrap.append(dStyle);
-        var w=wrap.width() + 20;
-        d.width(w);
-        d.html('');
-        var tmp='';
-        var wid=w/(arrX.length-1);
-        for(var i=1;i<arrX.length-1;i++){
-            tmp+='<div style="display:inline-block;width:'+wid+'px;text-align:center;"><span style="border-radius:10px;padding:1px 5px">'+arrX[i]+'</span></div>'
-        }
-        d.append(tmp);
-        
-        var dv=d.find('div span');
-        
-        wrap.click(function (e) {
-            event.stopPropagation();
-            if (e.offsetY < defaults.grid.y ||
-                this.offsetHeight - e.offsetY < defaults.grid.y2) {
-                dv.removeClass('act_x');
-            }
-        });
+		this.wrap = this.svg
+			.append('g')
+			.attr('transform', 'translate(' + [this.defaults.margin, this.defaults.margin] + ')');
+		this.draw();
     },
-    diyXonClick: function (d) {
-        var m_div = $(this.dom).find('#m_div');
-        var dv=$(this.dom).find('div span');
-        dv.removeClass('act_x');
-        
-        var dd=dv.eq(d[0].dataIndex-1);
-        if(d[0].dataIndex>0 && d[0].dataIndex<=dv.length){
-            dd.addClass('act_x');
-        }else{
-            dv.removeClass('act_x');
-        }
+	draw: function () {
+	},
+	clear: function () {
+        this.svg.selectAll('g').remove();
     },
-	renderTitle: function (title, subTitle) {
-		var wrap = this.svg.select('g').append('g').attr(
-			{transform:'translate('+(this.defaults.width / 2 - this.defaults.margin.left)+',0)'}
-		);
-		var text = wrap.attr('class', 'title-wrap').append('text');
-		
-		text.append('tspan')
-			.attr('x', 0)
-			.attr('class', 'title')
-			.text(title);
-		if (subTitle) {
-			text.append('tspan')
-			    .attr('x', 0)
-				.attr('dy', 16)
-				.attr('class', 'sub-title')
-				.text(subTitle);
+	destory: function () {
+		this.svg.remove();
+	},
+	
+	// common
+	getDataColor: function (i) {
+		return this.defaults.color[i % this.defaults.color.length];
+	}
+};
+
+ycharts._ui.echarts = {
+	mixins: [],
+	_defaults: {},
+	init: function () {
+		this.defaults = {};
+		this.echarts = echarts.init(this.dom);
+		return this;
+	},
+	_getOption: function () {
+		var optionsArr = [];
+		for (var i = 0; i < this.mixins.length; i++) {
+			if (this['getOption_' + this.mixins[i]]) {
+				optionsArr.push(this['getOption_' + this.mixins[i]]());
+			}
+		}
+		optionsArr.push(this['getOption_' + this.type]());
+		return ycharts.util.extend.apply(null, [true, {}].concat(optionsArr))
+	},
+	_setOption: function (defaults) {
+		this.defaults = ycharts.util.extend(true, {}, this._defaults, this.defaults, defaults);
+		this.echarts.setOption(this._getOption());
+	},
+	destory: function () {
+		this.echarts.dispose();
+	},
+	
+	// common
+	splitYAxis: function () {
+		var max = this.defaults.data.series_max;
+		var itemScale1, itemScale2;
+		if (max.length === 1) {
+			vitemScale1 = Math.ceil(max[0] / 5);
+			return {max: itemScale * 5, interval: itemScale};
+		} else {
+			itemScale1 = Math.ceil(max[0] / 5);
+			itemScale2 = Math.ceil(max[1] / 5);
+			return [
+				{max: itemScale1 * 5, interval: itemScale1},
+				{max: itemScale2 * 5, interval: itemScale2}
+			]
 		}
 	}
 };
+['on', 'off', 'clear', 'dispatchAction'].forEach(function (key) {
+	ycharts._ui.echarts[key] = function () {
+		this.echarts[key].apply(this.echarts, arguments);
+		return this;
+	};
+});

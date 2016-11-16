@@ -8,7 +8,7 @@
     <body>
 		<div class="documentation-header">
             <div class="documentation-title-wrapper">
-                <h1 class="hero-title">YXChart.js</h1>
+                <h1 class="hero-title">ychart.js</h1>
                 <h2 class="hero-subtitle">说明文档</h2>
             </div>
         </div>
@@ -16,60 +16,86 @@
 		<div class="documentation-body">
 			<h2>怎么使用</h2>
 			
-			<h3>引入jQuery</h3>
+			<h3>引入依赖类库</h3>
 			<pre>
-&lt;div id=&quot;conversionRateLineId&quot; style=&quot;height: 300px;&quot;&gt;&lt;/div&gt;
-&lt;script src=&quot;../lib/jquery.min.js&quot;&gt;&lt;/script&gt;
-
-
-
+&lt;script src=&quot;../src/js/lib/jquery.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../src/js/lib/echarts-all-3.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../src/js/ycharts.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../src/js/barLine.js&quot;&gt;&lt;/script&gt;
 			</pre>
-			<h3>引入d3或者echarts</h3>
-			
-			<pre>
-&lt;script src=&quot;../lib/d3.v3.min.js&quot;&gt;&lt;/script&gt; 或者				
-&lt;script src=&quot;../lib/echarts-all.js&quot;&gt;&lt;/script&gt;
-			</pre>
-			
-			<h3>引入d3类库或者配置类</h3>
+			<h3>调用 ychart</h3>
 			
 			<pre>
-&lt;script src=&quot;../src/YXCharts.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;../src/config/rateLine.js&quot;&gt;&lt;/script&gt;				
-				
+ycharts
+	.init(document.getElementById('main'), 'barLine')
+	.setOption({
+		color: ['#78a1ff', '#a883fd', '#00d9bf'],
+		xAxis_axisLine_lineStyle_color: '#ffbcbe',
+		series_barMaxWidth: 12,
+		yAxis_1_axisLabel_formatter_suffix: '',
+		yAxis_2_axisLabel_formatter_suffix: '%',
+		title_text: '全国月度指标完成情况',
+		data: {
+			legend_data: ['蒸发量', '降水量', '平均温度'],
+			xAxis_data: ['2016-01','2016-02','2016-03','2016-04','2016-05','2016-06','2016-07','2016-08','2016-09','2016-10','2016-11','2016-12'],  //横坐标数组
+			series_max: [200, 25],
+            series: [
+                {
+		            name:'蒸发量',
+		            data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+		        },
+		        {
+		            name:'降水量',
+		            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+		        },
+		        {
+		            name:'平均温度',
+		            data:[2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+		        }
+            ]
+		}
+	});
 			</pre>
 			
-			<h3>调用 new YXChart</h3>
+			<h3>如下</h3>
+			<iframe src="../example/barLine.html" width="100%" style="border: none; height: 400px" scrolling="no"></iframe>
 			
-			<pre>
-var yxcharts = new YXCharts(
-	 document.getElementById('conversionRateLineId'),
-	 'rateLine',
-	 {
-	    xAxis: [
-	       {
-	           data: ["5月", "6月", "7月", "8月", "9月", "10月"]
-	       }
-	    ],
-	    series: [
-	       {
-	           data: [0, "0.40", "0.32", "0.49", "0.60", "0.19"]
-	       }
-	    ]
-	 },
-	 {
-	    yAxis: [
-	        {
-	            axisLabel: {
-	                textStyle: {
-	                    color: '#f00'
-	                }
-	            }
-	        }
-	    ]
-	}
-);
-			</pre>
+			<h2>相关配置</h2>
+			
+			<h3>柱线混合</h3>
+			<iframe src="../example/barLine.html" width="100%" style="border: none; height: 400px" scrolling="no"></iframe>
+			<div class="table-wrapper"><table>
+			<thead>
+			<tr>
+			<th>名称</th>
+			<th>类型</th>
+			<th>描述</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+			<td>datasets</td>
+			<td>Array[object]</td>
+			<td>Contains data for each dataset. See the documentation for each chart type to determine the valid options that can be attached to the dataset</td>
+			</tr>
+			<tr>
+			<td>labels</td>
+			<td>Array[string]</td>
+			<td>Optional parameter that is used with the <a href="#scales-category-scale">category axis</a>.</td>
+			</tr>
+			<tr>
+			<td>xLabels</td>
+			<td>Array[string]</td>
+			<td>Optional parameter that is used with the category axis and is used if the axis is horizontal</td>
+			</tr>
+			<tr>
+			<td>yLabels</td>
+			<td>Array[string]</td>
+			<td>Optional parameter that is used with the category axis and is used if the axis is vertical</td>
+			</tr>
+			</tbody>
+			</table>
+			</div>
 		</div>
     </body>
 </html>

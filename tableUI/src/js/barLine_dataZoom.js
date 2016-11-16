@@ -1,190 +1,125 @@
-ycharts._ui.barLine = {
-	mixins: ['setOption'],
-	init: function () {
-		this.defaults = {
-			color: ['#78a1ff', '#a883fd', '#00d9bf'],
-			xAxis_axisLine_lineStyle_color: '#ffbcbe'
+ycharts._ui.barLine_dataZoom = {
+	mixins: ['echarts', 'barLine', 'dataZoom'],
+	_defaults: {
+		dataZoom_start: 0,
+		dataZoom_end: 50,
+		dataZoom_dataBackground_areaStyle_color: '#ffe1f0',
+		dataZoom_fillerColor: 'rgba(255, 180, 219, .4)',
+		dataZoom_handleStyle_color: '#ff78c0',
+		legend_itemGap: 20,
+		legend_formatter: function (name) {
+			return name;
+		},
+		data: {
+//			legend_data: [],// 图例
+//			xAxis_data: [],// 横坐标
+//			series_max: [],// 柱形和线形数据的两个最大值，如果是堆叠，堆叠数据相加算一个值比较
+//            series: [
+//                {
+//		            name:'',// 图例名称1
+//		            data:[]// 图例名称1对应数据
+//		        },
+//		        {
+//		            name:'',// 图例名称2
+//		            stack: '',// 可选，第二条柱形是否堆叠，这个值相同堆叠
+//		            detailName_data: [],// 可选，堆叠浮层显示类目不同
+//		            data:[]// 图例名称2对应数据
+//		        },
+//				{
+//		            name:'',// 图例名称3
+//		            stack: '',// 可选，第二条柱形是否堆叠，这个值相同堆叠
+//		            detailName_data: [],// 可选，堆叠浮层显示类目不同
+//		            data:[]// 图例名称3对应数据
+//		        },
+//		        ...
+//				{
+//		            name:'',// 图例名称last(对应线形数据)
+//		            data:[]// 图例名称last对应数据
+//		        }
+//            ]
+		}
+	},
+	tooltip_formatter: function (p) {
+		var htmlStr = '';
+		var _this = this;
+		var series = this.defaults.data.series;
+		var getItem = function (i, v) {
+			var detailName;
+			var val = i === p.length - 1  ? 
+				v.value + _this.defaults.yAxis_2_axisLabel_formatter_suffix : 
+				v.value + _this.defaults.yAxis_1_axisLabel_formatter_suffix;
+			
+			if (series[i].stack) {
+				detailName = series[i].detailName_data[v.dataIndex];
+			}
+			
+			return '<span style="background:' + v.color + ';border-radius: 50%;width: 10px; height: 10px; display: inline-block;margin-right: 5px;"></span>' + (detailName ? detailName : v.seriesName) + '：' + val + '<br/>';
 		};
-		this.echarts = echarts.init(this.dom);
-		return this;
+		for (var i = 0; i < p.length; i++) {
+			var v = p[i];
+			
+			if (i === 0) {
+				htmlStr += v.name + '<br/>' + getItem(i, v);
+			} else  {
+				htmlStr += getItem(i, v);
+			}
+		};
+		return htmlStr;
 	},
-	clear: function () {
-		this.echarts.clear();
-	},
-	_setOption: function () {
-		this.echarts.setOption(this.getFormatDefaults());
-	},
-	getFormatDefaults: function () {
+	getOption_barLine_dataZoom: function () {
         return {
             grid: {
 	            top: '20%',
 	            left: '1%',
 	            right: '1%',
-				bottom: '13%',
 				containLabel: true
 	        },
-			color: this.defaults.color,
 			title: {
 				show: true,
-				text: this.defaults.data.title_text,
 				left: 'center',
-				top: '5%',
+				top: '2%',
 				textStyle: {
 					fontWeight: 'normal',
 					fontSize: 14
 				}
-				
 			},
-		    tooltip: {
-		        trigger: 'axis',
-				axisPointer: {
-					type: 'line',
-					lineStyle: {
-						width: 0
-					}
-				}
-		    },
 		    legend: {
-				itemGap: 20,
+				top: '8%',
+				itemGap: this.defaults.legend_itemGap,
 				itemWidth: 10,
 				itemHeight: 10,
-				bottom: '1%',
+				formatter: this.defaults.legend_formatter,
 				textStyle: {
 					color: '#999'
-				},
-		        data: this.defaults.data.legend_data
+				}
 		    },
-		    xAxis: [
+			dataZoom: [
 		        {
-		            type: 'category',
-					axisLabel: {
-						show: true,
-						textStyle: {
-							color: '#666'
-						}
-					},
-					axisTick: {
-						show: true,
+					type: 'slider',
+					show: true,
+					start: this.defaults.dataZoom_start,
+					end: this.defaults.dataZoom_end,
+					backgroundColor: '#fff',
+					dataBackground: {
 						lineStyle: {
-							color: this.defaults.xAxis_axisLine_lineSyle_color
-						}
-					},
-					axisLine: {
-						show: true,
-						lineStyle: {
-							color: this.defaults.xAxis_axisLine_lineSyle_color
-						}
-					},
-					splitLine: {
-						show: true,
-						lineStyle: {
-							color: ['#f6f6f6']
-						}
-					},
-		            data: this.defaults.data.xAxis_data
-		        }
-		    ],
-		    yAxis: [
-		        {
-					splitLine: {
-		                show: true,
-		                lineStyle: {
-		                    color: ['#f6f6f6']
-		                }
-		            },
-		            axisLine: {
-		                show: true,
-		                lineStyle: {
-		                    color: '#f6f6f6'
-		                }
-		            },
-		            axisTick: {
-		                show: false
-		            },
-		            splitArea: {
-		                show: true,
-		                areaStyle: {
-		                    color: ['#fff', '#f9f9f9']
-		                }
-		            },
-		            type: 'value',
-		            min: 0,
-		            max: 200,
-		            interval: 30,
-		            axisLabel: {
-		                formatter: '{value}',
-						show: true,
-		                textStyle: {
-		                    color: '#999'
-		                }
-		            }
-		        },
-		        {
-					splitLine: {
-		                show: true,
-		                lineStyle: {
-		                    color: ['#f6f6f6']
-		                }
-		            },
-					axisLine: {
-		                show: true,
-		                lineStyle: {
-		                    color: '#f6f6f6'
-		                }
-		            },
-					axisTick: {
-		                show: false
-		            },
-		            splitArea: {
-		                show: true,
+							color: this.defaults.dataZoom_dataBackground_areaStyle_color
+						},
 						areaStyle: {
-							color: [ '#f9f9f9', '#fff']
+							color: this.defaults.dataZoom_dataBackground_areaStyle_color,
+							opacity: 1
 						}
-		            },
-		            type: 'value',
-		            min: 0.00,
-		            max: 150.00,
-		            interval: 25,
-		            axisLabel: {
-		                formatter: '{value}%',
-						show: true,
-		                textStyle: {
-		                    color: '#999'
-		                }
-		            }
-		        }
-		    ],
-		    series: [
-        {
-            name:'蒸发量',
-            type:'bar',
-			itemStyle: {
-                normal: {
-                    barBorderRadius: 2
-                }
-            },
-			barWidth: 12,
-            data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
-        },
-        {
-            name:'降水量',
-            type:'bar',
-			itemStyle: {
-                normal: {
-                    barBorderRadius: 2
-                }
-            },
-			barWidth: 12,
-            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-        },
-        {
-            name:'平均温度',
-			smooth: true,
-            type:'line',
-            yAxisIndex: 1,
-            data:[2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
-        }
-    ]
+					},
+					fillerColor: this.defaults.dataZoom_fillerColor,
+					borderColor: this.defaults.dataZoom_handleStyle_color,
+					handleIcon: 'M10 10 H 22 V 62 H 10 L 10 10',
+					handleStyle: {
+						color: this.defaults.dataZoom_handleStyle_color
+					},
+					textStyle: {
+						color: this.defaults.dataZoom_handleStyle_color
+					}
+				}
+			]
 		};
 	}
 };

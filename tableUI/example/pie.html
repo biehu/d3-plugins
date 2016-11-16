@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Untitled Document</title>
+    </head>
+    <body>
+    	
+		<div id="main" style=" height: 350px"></div>
+    	
+		<script src="../src/js/lib/jquery.min.js"></script>
+		<script src="../src/js/lib/echarts-all-3.js"></script>
+		<script src="../src/js/ycharts.js"></script>
+		<script src="../src/js/pie.js"></script>
+		
+		<script>
+			var yy = ycharts
+				.init(document.getElementById('main'), 'pie')
+				.setOption({
+					title_text: '2016年广东各分公司销量贡献度',
+					data: {
+						legend_data:['广州分公司','东莞分公司','深圳分公司','佛山分公司'],
+						series_data:[
+			                {value:335, name:'广州分公司'},
+			                {value:310, name:'东莞分公司'},
+			                {value:234, name:'深圳分公司'},
+			                {value:135, name:'佛山分公司'}
+			            ]
+					}
+				});
+				
+			
+		</script>
+		
+    </body>
+</html>
+

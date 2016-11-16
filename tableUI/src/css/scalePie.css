@@ -1,28 +1,40 @@
- .scale-pie .h1, .scale-pie .h3, .scale-pie .h2{
-    width: 80px;
-    margin: 0 auto;
-    padding-top: 20px;
-    line-height: 14px;
-    text-align: center;
-    font-size: 12px;
-    font-weight: normal;
+.scalePie  {
+	font-size: 12px;
 }
-.scale-pie .h3 {
+.scalePie .title-wrap .title {
+	text-anchor: middle;
+	font-size: 1.17em;
+}
+.scalePie .title-wrap .sub-title {
+	fill: #999999;
+	text-anchor: middle;
+}
+.scalePie .h1, .scalePie .h3, .scalePie .h2{
+	width: 80px;
+	margin: 0 auto;
+	padding-top: 20px;
+	line-height: 14px;
+	text-align: center;
+	font-weight: normal;
+}
+.scalePie .h3 {
     padding-top: 65px;
     word-wrap: break-word;
 }
-.scale-pie .h1 span:after {
+.scalePie .h1 span sub {
     content: '%';
-    font-size: 12px;
     vertical-align: top;
+	display: inline-block;
+	line-height: normal;
+	font-size: .3em;
 }
-.scale-pie .h1 span {
+.scalePie .h1 span {
     display: block;
+	line-height: 40px;
 }
-.scale-pie .h1{
+.scalePie .h1{
     overflow: hidden;
-    height: 34px;
+    height: 40px;
     padding-top: 0;
-    line-height: normal;
-    font-size: 40px;
+	font-size: 3.33em;
 }

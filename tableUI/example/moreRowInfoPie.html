@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+	<link rel="stylesheet" href="../src/css/moreRowInfoPie.css" />
+</head>
+<body>
+<div id="chart" class="chart-container" style="width:300px; height: 330px ; "></div>
+
+<script src="../src/js/lib/d3.v3.min.js"></script>
+<script src="../src/js/lib/jquery.min.js"></script>
+<script src="../src/js/ycharts.js"></script>
+<script src="../src/js/moreRowInfoPie.js"></script>
+<script>
+    var ycharts = ycharts
+	   .init(document.getElementById('chart'), 'moreRowInfoPie')
+       .setOption({
+	   		title_text: '广东各分公司|2016年销量贡献度',
+			lineText_formatter: function (d) {
+				return [
+					d.name + '分公司',
+					Math.round(d.scale * 100) + '% ( ' + d.value + '台 )'
+				];
+			},
+			legendText_formatter: function (d) {
+				return '年销售台次(' + d.name + ')';
+			},
+	        data: [
+				{
+					name: '东莞',
+					value: 1
+				},
+				{
+					name: '佛山山山',
+					value: 2
+				},
+				{
+					name: '广州州',
+					value: 40
+				},
+				{
+					name: '深圳',
+					value: 40
+				}
+			]
+			
+		});
+		
+</script>
+</body>

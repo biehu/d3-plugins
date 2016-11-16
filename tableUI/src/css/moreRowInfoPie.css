@@ -1,0 +1,15 @@
+.moreRowInfoPie .alert-win p {
+    margin: 0 0 10px 0;
+    padding: 0;
+}
+.moreRowInfoPie .alert-win .tooltip {
+    padding: 15px 10px;
+}
+.moreRowInfoPie .alert-win {
+    background: rgba(0, 0, 0, .7);
+    border-radius: 5px;
+    color: #fff;
+}
+.moreRowInfoPie .bar {
+	cursor: pointer;
+}

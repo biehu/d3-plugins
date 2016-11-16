@@ -1,5 +1,5 @@
 ycharts._ui.rateLine = {
-	mixins: ['setOption'],
+	mixins: ['echarts', 'setOption'],
 	init: function () {
 		this.defaults = {
 			tip_textStyle: '#dd0'
@@ -7,11 +7,6 @@ ycharts._ui.rateLine = {
 		this.echarts = echarts.init(this.dom);
 		this.options = {};
 		return this;
-	},
-	_setOption: function () {
-		this.options = ycharts.util.extend(true, {}, this.getFormatDefaults(), this.getLineToBorderDefaults());
-		this.echarts.setOption(this.options);
-		this.diyX();
 	},
 	getFormatDefaults: function () {
         return {
