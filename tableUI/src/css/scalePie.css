@@ -1,25 +1,25 @@
 .scalePie  {
-	font-size: 12px;
+	font-size: 10px;
 }
 .scalePie .title-wrap .title {
 	text-anchor: middle;
-	font-size: 1.17em;
+	font-size: 1.4em;
 }
 .scalePie .title-wrap .sub-title {
 	fill: #999999;
 	text-anchor: middle;
+	font-size: 1.2em;
 }
 .scalePie .h1, .scalePie .h3, .scalePie .h2{
-	width: 80px;
 	margin: 0 auto;
-	padding-top: 20px;
-	line-height: 14px;
 	text-align: center;
 	font-weight: normal;
+	font-size: 1.2em;
 }
 .scalePie .h3 {
-    padding-top: 65px;
     word-wrap: break-word;
+	color: #666;
+	font-size: 1.4em;
 }
 .scalePie .h1 span sub {
     content: '%';
@@ -30,11 +30,12 @@
 }
 .scalePie .h1 span {
     display: block;
-	line-height: 40px;
+	height: 1em;
+	line-height: 1em;
 }
 .scalePie .h1{
     overflow: hidden;
-    height: 40px;
     padding-top: 0;
-	font-size: 3.33em;
+	height: 1em;
+	font-size: 4em;
 }

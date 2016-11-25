@@ -17,32 +17,19 @@
 	   		title_text: '广东各分公司|2016年销量贡献度',
 			lineText_formatter: function (d) {
 				return [
-					d.name + '分公司',
+					d.name,
 					Math.round(d.scale * 100) + '% ( ' + d.value + '台 )'
 				];
 			},
-			legendText_formatter: function (d) {
-				return '年销售台次(' + d.name + ')';
-			},
-	        data: [
-				{
-					name: '东莞',
-					value: 1
-				},
-				{
-					name: '佛山山山',
-					value: 2
-				},
-				{
-					name: '广州州',
-					value: 40
-				},
-				{
-					name: '深圳',
-					value: 40
-				}
-			]
-			
+	        data: {
+				legend_data:['年销售台次(广州)','年销售台次(东莞)','年销售台次(深圳)','年销售台次(佛山)'],
+				series:[
+	                {value:335, name:'广州分公司'},
+	                {value:310, name:'东莞分公司'},
+	                {value:234, name:'深圳分公司'},
+	                {value:135, name:'佛山分公司'}
+	            ]
+			}
 		});
 		
 </script>

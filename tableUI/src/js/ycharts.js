@@ -29,7 +29,7 @@ ycharts.init = function (dom, type) {
 };
 
 ycharts.common = {
-	setOption: function (defaults, type) {
+	setOption: function (defaults) {
         var _this = this;
 		var args = arguments;
 		
@@ -54,24 +54,24 @@ ycharts._ui.d3 = {
 	_defaults: {},
 	init: function () {
 		this.defaults = {};
-        this.svg = d3.select(this.dom).append("svg");
+        this.svg = d3.select(this.dom).append("svg").attr('class', this.type);
 		this.wrap = null;
 		return this;
     },
 	_setOption: function (defaults) {
 		this.defaults = ycharts.util.extend({}, this._defaults, this.defaults, defaults);
-//		this.svg.attr({
-//			width: this.defaults.width  + 2 *this.defaults.margin,
-//			height: this.defaults.height +  2 *this.defaults.margin
-//		});
 		
-		this.svg.attr("preserveAspectRatio", "xMaxYMax meet")
-            .attr("viewBox", "0 0 " + 
-				(this.defaults.width  + 2 *this.defaults.margin) + " " + 
-				(this.defaults.height +  2 *this.defaults.margin));
+		this.defaults.width = $(this.dom).width() - 2 * this.defaults.margin;
+		this.defaults.height = $(this.dom).height() - 2 * this.defaults.margin;
 		
-		this.wrap = this.svg
-			.append('g')
+		this.svg
+			.attr({
+				width: $(this.dom).width(),
+				height: $(this.dom).height()
+			})
+			.style('font-size', this.defaults.fontSize)
+		
+		this.wrap = this.svg.append('g')
 			.attr('transform', 'translate(' + [this.defaults.margin, this.defaults.margin] + ')');
 		this.draw();
     },
@@ -79,9 +79,11 @@ ycharts._ui.d3 = {
 	},
 	clear: function () {
         this.svg.selectAll('g').remove();
+		return this;
     },
 	destory: function () {
 		this.svg.remove();
+		return this;
 	},
 	
 	// common
@@ -131,6 +133,27 @@ ycharts._ui.echarts = {
 				{max: itemScale2 * 5, interval: itemScale2}
 			]
 		}
+	},
+	colorRgb: function(s, o){  
+		var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;  
+	    var sColor = s.toLowerCase();  
+	    if(sColor && reg.test(sColor)){  
+	        if(sColor.length === 4){  
+	            var sColorNew = "#";  
+	            for(var i=1; i<4; i+=1){  
+	                sColorNew += sColor.slice(i,i+1).concat(sColor.slice(i,i+1));     
+	            }  
+	            sColor = sColorNew;  
+	        }  
+	        //处理六位的颜色值
+	        var sColorChange = [];  
+	        for(var i=1; i<7; i+=2){  
+	            sColorChange.push(parseInt("0x"+sColor.slice(i,i+2)));    
+	        }  
+	        return "rgba(" + sColorChange.join(",") + "," + (o ? o : 1) + ")";  
+	    }else{  
+	        return sColor;    
+	    }  
 	}
 };
 ['on', 'off', 'clear', 'dispatchAction'].forEach(function (key) {

@@ -1,15 +1,36 @@
 ycharts._ui.barLine = {
 	mixins: ['echarts'],
 	_defaults: {
-		color: ['#78a1ff', '#a883fd', '#00d9bf'],
-		series_barMaxWidth: 12,
-		title_text:'',
-		xAxis_axisLine_lineStyle_color: '#ffbcbe',
-		yAxis_1_axisLabel_formatter_suffix: '',
-		yAxis_2_axisLabel_formatter_suffix: '',
-		grid_bottom: '13%',
-		xAxis_axisLabel_textStyle_color: function (n) {
+		color: ['#78a1ff', '#a883fd', '#00d9bf'],// 数据颜色配置，按数据顺序走不够了循环
+		series_barMaxWidth: 12,// 柱形的最大宽度，整体宽度允许的话始终保持，太窄了会变细
+		title_text:'',// 标题文字
+		xAxis_axisLine_lineStyle_color: '#ffbcbe',// x轴线以及刻度的颜色
+		yAxis_1_axisLabel_formatter_suffix: '',// 第一条y轴刻度文字后缀
+		yAxis_2_axisLabel_formatter_suffix: '',// 第二条y轴刻度文字后缀
+		title_top: 0,// 标题距离顶部的距离
+		grid_bottom: '13%',// 网格包含x轴距离底部的距离
+		xAxis_axisLabel_textStyle_color: function (n) {// x轴刻度文字颜色
 			return '#666';
+		},
+		tooltip_formatter: function (p) {// 浮动框文字格式化
+			var htmlStr = '';
+			var _this = this;
+			var getItem = function (v, i) {
+				var val = i === p.length - 1  ? 
+					v.value + _this.defaults.yAxis_2_axisLabel_formatter_suffix : 
+					v.value + _this.defaults.yAxis_1_axisLabel_formatter_suffix;
+				
+				return '<span style="background:' + v.color + ';border-radius: 50%;width: 10px; height: 10px; display: inline-block;margin-right: 5px;"></span>' + v.seriesName + '：' + val + '<br/>';
+			};
+			for (var i = 0; i < p.length; i++) {
+				var v = p[i];
+				if (i === 0) {
+					htmlStr += v.name + '<br/>' + getItem(v, i);
+				} else  {
+					htmlStr += getItem(v, i);
+				}
+			};
+			return htmlStr;
 		},
 		data: {
 //			legend_data: [],// 图例
@@ -58,26 +79,6 @@ ycharts._ui.barLine = {
 		
 		return arr;
 	},
-	tooltip_formatter: function (p) {
-		var htmlStr = '';
-		var _this = this;
-		var getItem = function (v, i) {
-			var val = i === p.length - 1  ? 
-				v.value + _this.defaults.yAxis_2_axisLabel_formatter_suffix : 
-				v.value + _this.defaults.yAxis_1_axisLabel_formatter_suffix;
-			
-			return '<span style="background:' + v.color + ';border-radius: 50%;width: 10px; height: 10px; display: inline-block;margin-right: 5px;"></span>' + v.seriesName + '：' + val + '<br/>';
-		};
-		for (var i = 0; i < p.length; i++) {
-			var v = p[i];
-			if (i === 0) {
-				htmlStr += v.name + '<br/>' + getItem(v, i);
-			} else  {
-				htmlStr += getItem(v, i);
-			}
-		};
-		return htmlStr;
-	},
 	getOption_barLine: function () {
 		var defaults = this.defaults;
 		var splitYAxis = this.splitYAxis();
@@ -85,7 +86,7 @@ ycharts._ui.barLine = {
 		
         return {
             grid: {
-	            top: '20%',
+	            top: '15%',
 	            left: '1%',
 	            right: '1%',
 				bottom: defaults.grid_bottom,
@@ -96,7 +97,7 @@ ycharts._ui.barLine = {
 				show: true,
 				text: defaults.title_text,
 				left: 'center',
-				top: '5%',
+				top: defaults.title_top,
 				textStyle: {
 					fontWeight: 'normal',
 					fontSize: 14
@@ -106,7 +107,7 @@ ycharts._ui.barLine = {
 		    tooltip: {
 		        trigger: 'axis',
 				formatter: function (p) {
-					return _this.tooltip_formatter.call(_this, p);
+					return defaults.tooltip_formatter.call(_this, p);
 				},
 				axisPointer: {
 					type: 'line',
@@ -116,6 +117,7 @@ ycharts._ui.barLine = {
 				}
 		    },
 		    legend: {
+				selectedMode: false,
 				itemWidth: 10,
 				itemHeight: 10,
 				bottom: '1%',

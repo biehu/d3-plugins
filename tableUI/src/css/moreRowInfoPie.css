@@ -1,15 +1,13 @@
-.moreRowInfoPie .alert-win p {
-    margin: 0 0 10px 0;
-    padding: 0;
+.moreRowInfoPie .title {
+	font-size: 1.4em;
 }
-.moreRowInfoPie .alert-win .tooltip {
-    padding: 15px 10px;
+.moreRowInfoPie {
+	font-size: 10px;
 }
-.moreRowInfoPie .alert-win {
-    background: rgba(0, 0, 0, .7);
-    border-radius: 5px;
-    color: #fff;
+.moreRowInfoPie .slice-text {
+	font-size: 1.2em;
 }
 .moreRowInfoPie .bar {
 	cursor: pointer;
+	font-size: 1.2em;
 }

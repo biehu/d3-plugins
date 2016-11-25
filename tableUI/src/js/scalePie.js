@@ -1,28 +1,29 @@
 ycharts._ui.scalePie = {
 	mixins: ['d3'],
 	_defaults: {
-		width: 220,
-        height: 300,
         margin: 20,
-		circleBgColor: '#eee',
-		circleFrontColor: '#00d9bf',
-		fontSize: 12,
-        data: {},
-        title_text: '',
-		title_subtext: ''
+		circleBgColor: '#eee',// 圆环背景色
+		circleFrontColor: '#00d9bf',// 圆环前景色
+		fontSize: 10,// 基础文字大小
+		outerRadius: 0.35,// 外环半径
+        title_text: '',// 标题文字
+		title_subtext: '',// 子标题文字
+        data: {
+			series: {
+//				name: '',// 数值下方文字描述
+//				value: 0,// 中间数值，会自动加上%带翻页效果
+//				nameInfo: ''// 底部圆弧缺口位置文字
+			}
+		}
 	},
 	draw: function () {
-	    var outerRadius = 90;
-	    var innerRadius = 70;
+	    var outerRadius = this.defaults.width * this.defaults.outerRadius;
+	    var innerRadius = this.defaults.width * (this.defaults.outerRadius -0.08);
 		var _this = this;
-	    
-	    this.svg
-			.attr('class', 'scalePie')
-			.style('font-size', this.defaults.fontSize);
 			
 		var renderTitle = function (title, subTitle) {
 			var wrap = _this.svg.select('g').append('g').attr(
-				{transform:'translate('+(_this.defaults.width / 2 - _this.defaults.margin)+',0)'}
+				{transform:'translate('+ _this.defaults.width / 2 +',0)'}
 			);
 			var text = wrap.attr('class', 'title-wrap').append('text');
 			
@@ -33,7 +34,7 @@ ycharts._ui.scalePie = {
 			if (subTitle) {
 				text.append('tspan')
 				    .attr('x', 0)
-					.attr('dy', 16)
+					.attr('dy', 1.6 * _this.defaults.fontSize)
 					.attr('class', 'sub-title')
 					.text(subTitle);
 			}
@@ -41,10 +42,10 @@ ycharts._ui.scalePie = {
 		
 		renderTitle(this.defaults.title_text, this.defaults.title_subtext);// title
 		
-	    var circle = this.svg.select('g').append('g');
+	    var circle = this.wrap.append('g');
 		circle.attr({transform:'translate('+
-			(this.defaults.width / 2 - this.defaults.margin)+','+ 
-			(this.defaults.height / 2 - this.defaults.margin) +
+			(this.defaults.width / 2)+','+ 
+			(this.defaults.height - this.defaults.height * this.defaults.outerRadius) +
 		')'});
 		
 	    
@@ -70,7 +71,7 @@ ycharts._ui.scalePie = {
 			.style('fill', this.defaults.circleFrontColor);
 	    
 	    var h1Html = '';
-	    for (var i = 0; i < (+this.defaults.data.middleVal + 1); i++) {
+	    for (var i = 0; i < (+this.defaults.data.series.value + 1); i++) {
 	        h1Html += '<span>' + i + '<sub>%</sub></span>';
 	    }
 	    
@@ -83,15 +84,14 @@ ycharts._ui.scalePie = {
 	        .attr('x', -textWidth / 2)
 	        .attr('y', -20)
 	        .html('<div class="h1" style="color:' + middleCountColor + '">' + h1Html + '</div>');
-		var middleValDescTop = this.defaults.data.middleValDesc.length > 6 ? 20 : 35;
 	    var bottomCount=circle.append('foreignObject')
 	        .attr('class', 'middle-val-desc')
 	        .attr('width', textWidth)
 			.attr('height', textWidth)
 	        .attr('x', -textWidth / 2)
 	        .html(
-				'<div class="h2" style="padding-top:' + middleValDescTop  + 'px">' + 
-				this.defaults.data.middleValDesc + 
+				'<div class="h2" style="padding-top:' + (innerRadius - this.defaults.fontSize / 2 - 2.5 * this.defaults.fontSize)  + 'px">' + 
+				this.defaults.data.series.name + 
 				'</div>'
 			);
 	    var bottomText=circle.append('foreignObject')
@@ -99,7 +99,11 @@ ycharts._ui.scalePie = {
 	        .attr('width', textWidth)
 			.attr('height', textWidth)
 	        .attr('x', -textWidth / 2)
-	        .html('<div class="h3">' + this.defaults.data.bottomText + '</div>');
+	        .html(
+				'<div class="h3" style="padding-top:' + (innerRadius - this.defaults.fontSize / 2)  + 'px">' + 
+				this.defaults.data.series.nameInfo + 
+				'</div>'
+			);
 	    
 	    var arcTween = function (transition, newAngle) { 
 	        transition.attrTween("d", function (d) {
@@ -107,7 +111,7 @@ ycharts._ui.scalePie = {
 	            var interpolateVal = d3.interpolate(0, newAngle);
 	            return function (t) {
 	                d.endAngle = interpolate(t);
-	                middleCount.select('.middle-val span').style('margin-top', interpolateVal(t) * -40 + 'px');
+	                middleCount.select('.middle-val span').style('margin-top', interpolateVal(t) * -_this.defaults.fontSize * 4 + 'px');
 	                return arc(d);
 	            }
 	        });
@@ -115,6 +119,6 @@ ycharts._ui.scalePie = {
 	    
 	    pathForeground.transition()
 	       .duration(750)
-	       .call(arcTween, this.defaults.data.middleVal);
+	       .call(arcTween, this.defaults.data.series.value);
 	}
 };

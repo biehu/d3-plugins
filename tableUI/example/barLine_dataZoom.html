@@ -8,7 +8,7 @@
     	
 		<div id="main" style=" height: 350px"></div>
 		<div id="main2" style=" height: 350px"></div>
-    	
+		
 		<script src="../src/js/lib/jquery.min.js"></script>
 		<script src="../src/js/lib/echarts-all-3.js"></script>
 		<script src="../src/js/ycharts.js"></script>
@@ -23,26 +23,25 @@
 					xAxis_axisLine_lineStyle_color: '#ffbcbe',
 					yAxis_1_axisLabel_formatter_suffix: '',
 					yAxis_2_axisLabel_formatter_suffix: '%',
-					title_text: '全国月度指标完成情况',
+					title_text: '2016年某某大区下各省年度指标完成情况',
 					dataZoom_dataBackground_areaStyle_color: '#ffe1f0',
-					dataZoom_fillerColor: 'rgba(255, 180, 219, .4)',
 					dataZoom_handleStyle_color: '#ff78c0',
 					dataZoom_end: 70,
 					data: {
-						legend_data: ['蒸发量', '降水量', '平均温度'],
-						xAxis_data: ['2016-01','2016-02','2016-03','2016-04','2016-05','2016-06','2016-07','2016-08','2016-09','2016-10','2016-11','2016-12'],  //横坐标数组
+						legend_data: ['计划销售台次', '实际销售台次', '年度完成率'],
+						xAxis_data: ['广州','广西','河北','北京','上海','黑龙江','湖南','湖北','海南','2016-10','2016-11','2016-12'],  //横坐标数组
 						series_max: [200, 25],
 	                    series: [
 	                       {
-					            name:'蒸发量',
+					            name:'计划销售台次',
 					            data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
 					        },
 					        {
-					            name:'降水量',
+					            name:'实际销售台次',
 					            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
 					        },
 					        {
-					            name:'平均温度',
+					            name:'年度完成率',
 					            data:[2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
 					        }
 	                    ]
@@ -58,56 +57,105 @@
 					yAxis_2_axisLabel_formatter_suffix: '%',
 					title_text: '全国月度指标完成情况',
 					dataZoom_dataBackground_areaStyle_color: '#ffe1f0',
-					dataZoom_fillerColor: 'rgba(255, 180, 219, .2)',
 					dataZoom_handleStyle_color: '#ff78c0',
-					series_barMaxWidth: 8,
 					legend_itemGap: 1,
+					dataZoom_end: 30,
+					tooltip_formatter: function (p) {
+						var htmlStr = '';
+						var _this = this;
+						var series = this.defaults.data.series;
+						var childArr = [];
+						var childSum = 0;
+						var stack = '';
+						var getItem = function (i, v) {
+							var detailName;
+							var val = i === p.length - 1  ? 
+								v.value + _this.defaults.yAxis_2_axisLabel_formatter_suffix : 
+								v.value + _this.defaults.yAxis_1_axisLabel_formatter_suffix;
+							
+							var htmlStr = '';
+							if (series[i].stack) {
+								stack = series[i].stack;
+								detailName = series[i].detailName_data[v.dataIndex];
+							
+								if (detailName) {
+									childArr.push([detailName, val]);
+									childSum += Number(val);
+								}
+								return '';
+							} else {
+								return htmlStr + v.seriesName + '：' + val + '<br/>';
+							}
+						};
+						
+						
+						// 总计
+						for (var i = 0; i < p.length; i++) {
+							var v = p[i];
+							
+							if (i === 0) {
+								htmlStr += v.name + '累计<br/>' + getItem(i, v);
+							} else  {
+								htmlStr += getItem(i, v);
+							}
+						};
+						htmlStr += stack + ': ' + childSum + '<br/>';
+						
+						if (childArr.length > 1) {
+							// 各分公司
+							htmlStr += '<br/>'+ v.name + '<br />';
+							for (var i = 0; i < childArr.length; i++) {
+								htmlStr += childArr[i][0] + ': ' + childArr[i][1] + ', 占比' + Math.round(childArr[i][1] / childSum * 100) + '%<br/>';
+							}
+						}
+						
+						
+						return htmlStr;
+					},
 					legend_formatter: function (name) {
 						var blank = '       ';
-						if (name === '昨天降水量' ||
-							name === '今天降水量') {
-							return '';	
-						} else if (name === '明天降水量') {
-							return '降水量' + blank;
+						if (name.indexOf('实际销售台次last') >= 0) {
+							return '实际销售台次' + blank;
+						} else if (name.indexOf('实际销售台次') >= 0) {
+							return '';
 						} else {
 							return name + blank;
 						}
 					},
 					data: {
-						legend_data: ['蒸发量', '昨天降水量', '今天降水量', '明天降水量', '平均温度'],
-						xAxis_data: ['01','02','03','04','05','06','07','08','09','10','11','12'],  //横坐标数组
+						legend_data: ['计划销售台次', '实际销售台次1', '实际销售台次2', '实际销售台次last', '年度完成率'],
+						xAxis_data: ['广东各分公司','长沙分公司','石家庄各分公司','北京各分公司','太原各分公司','黑龙江各分公司','济南各分公司','08','09','10','11','12'],  //横坐标数组
 						series_max: [1000, 25],
 	                    series: [
 	                       {
-					            name:'蒸发量',
-					            data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+					            name:'计划销售台次',
+					            data:[500, 300, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
 					        },
 					        {
-					            name:'昨天降水量',
-								stack: '降水量',
-								detailName_data: ['北京大学','河北大学','03','04','05','06','07','08','09','10','11','12'],
-					            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+					            name:'实际销售台次1',
+								stack: '实际销售台次',
+								detailName_data: ['广州分公司','长沙分公司','23','04','05','06','07','08','09','10','11','12'],
+					            data:[100, 159, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
 					        },
 							{
-					            name:'今天降水量',
-								stack: '降水量',
-								detailName_data: ['清华大学','华北电力','03','04','05','06','07','08','09','10','11','12'],
-					            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+					            name:'实际销售台次2',
+								stack: '实际销售台次',
+								detailName_data: ['深圳分公司','','3','04','05','06','07','08','09','10','11','12'],
+					            data:[200, 0, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
 					        },
 							{
-					            name:'明天降水量',
-								stack: '降水量',
-								detailName_data: ['北京科技大学','河北科技','03','04','05','06','07','08','09','10','11','12'],
-					            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+					            name:'实际销售台次last',
+								stack: '实际销售台次',
+								detailName_data: ['佛山分公司','','','04','05','06','07','08','09','10','11','12'],
+					            data:[300, 0, 0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
 					        },
 					        {
-					            name:'平均温度',
+					            name:'年度完成率',
 					            data:[2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
 					        }
 	                    ]
 					}
 				});
-			
 		</script>
 		
     </body>

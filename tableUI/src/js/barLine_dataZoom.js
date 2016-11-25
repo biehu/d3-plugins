@@ -1,13 +1,12 @@
 ycharts._ui.barLine_dataZoom = {
 	mixins: ['echarts', 'barLine', 'dataZoom'],
 	_defaults: {
-		dataZoom_start: 0,
-		dataZoom_end: 50,
-		dataZoom_dataBackground_areaStyle_color: '#ffe1f0',
-		dataZoom_fillerColor: 'rgba(255, 180, 219, .4)',
-		dataZoom_handleStyle_color: '#ff78c0',
-		legend_itemGap: 20,
-		legend_formatter: function (name) {
+		dataZoom_start: 0,// dataZoom 开始位置
+		dataZoom_end: 100,// dataZoom 结束位置
+		dataZoom_dataBackground_areaStyle_color: '#ffe1f0',// 内部颜色块背景色
+		dataZoom_handleStyle_color: '#ff78c0',// 滑块、边框、过滤颜色
+		legend_itemGap: 20,// legend类目间距
+		legend_formatter: function (name) {// legend类目内容格式化
 			return name;
 		},
 		data: {
@@ -39,32 +38,15 @@ ycharts._ui.barLine_dataZoom = {
 //            ]
 		}
 	},
-	tooltip_formatter: function (p) {
-		var htmlStr = '';
+	init: function () {
+		this.defaults = {};
+		this.echarts = echarts.init(this.dom);
 		var _this = this;
-		var series = this.defaults.data.series;
-		var getItem = function (i, v) {
-			var detailName;
-			var val = i === p.length - 1  ? 
-				v.value + _this.defaults.yAxis_2_axisLabel_formatter_suffix : 
-				v.value + _this.defaults.yAxis_1_axisLabel_formatter_suffix;
-			
-			if (series[i].stack) {
-				detailName = series[i].detailName_data[v.dataIndex];
-			}
-			
-			return '<span style="background:' + v.color + ';border-radius: 50%;width: 10px; height: 10px; display: inline-block;margin-right: 5px;"></span>' + (detailName ? detailName : v.seriesName) + '：' + val + '<br/>';
-		};
-		for (var i = 0; i < p.length; i++) {
-			var v = p[i];
-			
-			if (i === 0) {
-				htmlStr += v.name + '<br/>' + getItem(i, v);
-			} else  {
-				htmlStr += getItem(i, v);
-			}
-		};
-		return htmlStr;
+		this.echarts.on('datazoom', function () {
+			_this.defaults.dataZoom_start = this.getOption().dataZoom[0].start;
+			_this.defaults.dataZoom_end = this.getOption().dataZoom[0].end;
+		});
+		return this;
 	},
 	getOption_barLine_dataZoom: function () {
         return {
@@ -109,7 +91,7 @@ ycharts._ui.barLine_dataZoom = {
 							opacity: 1
 						}
 					},
-					fillerColor: this.defaults.dataZoom_fillerColor,
+					fillerColor: this.colorRgb(this.defaults.dataZoom_handleStyle_color, .4),
 					borderColor: this.defaults.dataZoom_handleStyle_color,
 					handleIcon: 'M10 10 H 22 V 62 H 10 L 10 10',
 					handleStyle: {

@@ -16,9 +16,11 @@
 	   .init(document.getElementById('chart2'), 'scalePie')
        .setOption({
 	        data: {
-	            middleVal: 93,
-	            middleValDesc: '全国租赁业务总体完成率',
-	            bottomText: '2016-09-25'
+				series: {
+					name: '全国租赁业务总体完成率',// 数值下方文字描述
+					value: 93,// 中间数值，会自动加上%带翻页效果
+					nameInfo: '2016年'// 底部圆弧缺口位置文字
+				}
 	        },
 			circleFrontColor: '#ff7379',
 			title_text: '全国9月月度指标累计完成率',
@@ -29,9 +31,11 @@
 	   .init(document.getElementById('chart3'), 'scalePie')
        .setOption({
 	        data: {
-	            middleVal: 87,
-	            middleValDesc: '年度完成率',
-	            bottomText: '2016年'
+				series: {
+					name: '年度完成率',// 数值下方文字描述
+					value: 87,// 中间数值，会自动加上%带翻页效果
+					nameInfo: '2016年'// 底部圆弧缺口位置文字
+				}
 	        },
 			title_text: '全国9月月度指标累计完成率',
 			title_subtext: '(截止到9月7日)'
