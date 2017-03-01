@@ -1,0 +1,43 @@
+.instrumentBoard .line, .instrumentBoard .minute line {
+	opacity: .3;
+}
+.instrumentBoard .hour {
+	text-anchor: middle;
+	font-size: 10px;
+	fill: #787878;
+}
+.instrumentBoard .intro {
+	display: inline-block;
+	width: 88px;
+	padding: 5px 10px;
+	border-radius: 3px;
+	text-align: center;
+	font-size: 16px;
+}
+.instrumentBoard .legend {
+	width: 100%;
+	font-size: 12px;
+	color: #787878;
+}
+.instrumentBoard .legend tr {
+    border-bottom: 1px solid grey;
+}
+.instrumentBoard .legend tr:first-child {
+    border-top: 1px solid grey;
+}
+.instrumentBoard .legend td{
+    padding:4px 5px;
+    vertical-align:bottom;
+}
+.instrumentBoard .legend i {
+	display: inline-block;
+	width: 20px;
+	height: 8px;
+	margin-right: 5px;
+	border-radius: 2px;
+}
+.instrumentBoard table {
+	width: 100%;
+	text-align: center;
+}
+  
